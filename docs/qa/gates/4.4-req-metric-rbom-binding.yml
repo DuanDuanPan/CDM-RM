@@ -1,0 +1,24 @@
+schema: 1
+story: '4.4'
+story_title: '需求/指标 ↔ RBOM Part 绑定'
+gate: 'CONCERNS'
+status_reason: 'Initial gate: 绑定完整性与一致性、反向导航需验证。'
+reviewer: 'Quinn (Test Architect)'
+updated: '2025-09-22T06:52:26.100892+00:00'
+
+waiver: { active: false }
+
+top_issues:
+  - id: 'BIND-REL-001'
+    severity: medium
+    finding: '唯一/外键约束与去重策略未验证。'
+    suggested_action: '补齐完整性校验与修复脚本测试。'
+
+risk_summary:
+  totals: { critical: 0, high: 0, medium: 1, low: 0 }
+  recommendations:
+    must_fix:
+      - '确保互链一致并可追踪。'
+    monitor:
+      - '规模化场景下性能。'
+

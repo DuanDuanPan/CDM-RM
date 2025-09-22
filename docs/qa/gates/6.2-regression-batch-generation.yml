@@ -1,0 +1,40 @@
+schema: 1
+story: '6.2'
+story_title: '回归批次生成'
+gate: 'CONCERNS'
+status_reason: 'Initial gate: 关联一致性、失败重试与报告稳定性需验证。'
+reviewer: 'Quinn (Test Architect)'
+updated: '2025-09-22T06:52:26.100892+00:00'
+
+waiver: { active: false }
+
+top_issues:
+  - id: 'BATCH-LINK-001'
+    severity: medium
+    finding: '批次与工作包/用例关联与幂等未覆盖完整。'
+    suggested_action: '补齐状态机/重试/报告一致性测试。'
+
+risk_summary:
+  totals: { critical: 0, high: 0, medium: 1, low: 0 }
+  recommendations:
+    must_fix:
+      - '验证幂等与关联一致性。'
+    monitor:
+      - '执行吞吐与队列积压。'
+
+quality_gates:
+  - id: BATCH-IDEMP-001
+    area: reliability
+    metric: '同一变更包重复触发的幂等性'
+    threshold: '重复触发 N=5 次仅生成 1 个批次；无重复关联'
+    validation: '集成回放：幂等键/去重日志/DB 约束通过'
+  - id: BATCH-LINK-001
+    area: reliability
+    metric: '批次-工作包/用例 关联一致性'
+    threshold: '关联完整性 100%；断链=0；唯一/外键校验通过'
+    validation: '完整性校验器 + 集成校验报告'
+  - id: BATCH-RETRY-001
+    area: reliability
+    metric: '失败重试策略'
+    threshold: '指数退避≤3 次；黑名单生效；无无限重试'
+    validation: '状态机测试 + 失败注入回放'

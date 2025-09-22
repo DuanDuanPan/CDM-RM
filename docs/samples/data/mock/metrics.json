@@ -1,0 +1,65 @@
+[
+  {
+    "id": "MET-ENG-THRUST-TO",
+    "requirementId": "REQ-ENG-0001",
+    "name": "最大起飞推力",
+    "unit": "kN",
+    "value": 122.0,
+    "confidence": 0.95,
+    "status": "approved"
+  },
+  {
+    "id": "MET-ENG-TSFC-CRUISE",
+    "requirementId": "REQ-ENG-0002",
+    "name": "巡航 TSFC",
+    "unit": "kg/(kN·h)",
+    "value": 0.58,
+    "confidence": 0.88,
+    "status": "suggested"
+  },
+  {
+    "id": "MET-ENG-T4",
+    "requirementId": "REQ-ENG-0004",
+    "name": "高压涡轮入口温度 T4",
+    "unit": "K",
+    "value": 1720,
+    "confidence": 0.8,
+    "status": "suggested"
+  },
+  {
+    "id": "MET-ENG-NOx",
+    "requirementId": "REQ-ENG-0003",
+    "name": "NOx 排放指数",
+    "unit": "g/kN",
+    "value": 14.0,
+    "confidence": 0.9,
+    "status": "approved"
+  },
+  {
+    "id": "MET-ENG-THROTTLE-RESP",
+    "requirementId": "REQ-ENG-TR-0001",
+    "name": "加速响应时间",
+    "unit": "s",
+    "value": 4.6,
+    "confidence": 0.85,
+    "status": "approved"
+  },
+  {
+    "id": "MET-ENG-MTBF",
+    "requirementId": "REQ-ENG-XR-REL-0001",
+    "name": "MTBF",
+    "unit": "h",
+    "value": 1210,
+    "confidence": 0.7,
+    "status": "suggested"
+  },
+  {
+    "id": "MET-ENG-LRU-MTTR",
+    "requirementId": "REQ-ENG-XR-MAINT-0002",
+    "name": "LRU 更换时间",
+    "unit": "min",
+    "value": 26,
+    "confidence": 0.8,
+    "status": "approved"
+  }
+]

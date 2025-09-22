@@ -1,0 +1,15 @@
+{
+  "summary": {
+    "checked": 161,
+    "external": 0,
+    "issues": 1
+  },
+  "issues": [
+    {
+      "type": "missing_anchor",
+      "message": "未找到锚点 #资源动作示例",
+      "file": "docs/architecture/index.md",
+      "target": "./权限与治理矩阵rbacabac-export-governance.md#资源动作示例"
+    }
+  ]
+}

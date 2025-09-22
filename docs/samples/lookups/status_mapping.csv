@@ -1,0 +1,9 @@
+doors_value,unified_value,notes
+Draft,草拟,
+In Review,评审中,
+Baseline,冻结,alias of Released
+Released,冻结,
+Change,变更中,alias of Pending
+Pending,变更中,
+Closed,关闭,
+

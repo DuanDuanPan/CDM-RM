@@ -1,0 +1,40 @@
+schema: 1
+story: '3.4'
+story_title: '字段级权限（默认拒绝）'
+gate: 'CONCERNS'
+status_reason: 'Initial gate: 读/写权限边界与泄漏风险需验证。'
+reviewer: 'Quinn (Test Architect)'
+updated: '2025-09-22T06:52:26.100892+00:00'
+
+waiver: { active: false }
+
+top_issues:
+  - id: 'AUTH-FIELD-001'
+    severity: high
+    finding: '未授权字段泄漏与写入阻断未端到端验证。'
+    suggested_action: '补齐越权/旁路用例与日志审计校验。'
+
+risk_summary:
+  totals: { critical: 0, high: 1, medium: 0, low: 0 }
+  recommendations:
+    must_fix:
+      - '完善策略/中间件与防护测试。'
+    monitor:
+      - '策略变更回归。'
+
+quality_gates:
+  - id: AUTH-READ-001
+    area: security
+    metric: '未授权字段读取阻断'
+    threshold: '对未授权用户/角色，请求字段级数据时返回 403/字段剔除；0 次泄漏'
+    validation: '集成用例：越权读（P0）×3 角色；日志无敏感字段'
+  - id: AUTH-WRITE-001
+    area: security
+    metric: '未授权字段写入阻断'
+    threshold: '未授权写入被拒（4xx）；DB 无落库；审计记录齐全'
+    validation: '集成用例：越权写（P0）×3 场景；DB/审计校验'
+  - id: AUTH-AUDIT-001
+    area: reliability
+    metric: '权限策略变更审计完整'
+    threshold: '审计包含 who/when/what/diff；100% 样本覆盖'
+    validation: '单元+集成：策略变更→审计落库→可检索'

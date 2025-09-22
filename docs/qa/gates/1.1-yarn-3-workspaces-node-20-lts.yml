@@ -1,0 +1,32 @@
+schema: 1
+story: '1.1'
+story_title: 'Yarn 3 Workspaces 与 Node 20 LTS'
+gate: 'CONCERNS'
+status_reason: 'Planning-stage review: key ACs not implemented (.yarnrc.yml, workspaces, CI cache/immutable).'
+reviewer: 'Quinn (Test Architect)'
+updated: '2025-09-22T06:52:26.100892+00:00'
+
+waiver: { active: false }
+
+top_issues:
+  - id: 'TOOL-001'
+    severity: high
+    finding: 'Missing .yarnrc.yml with nodeLinker: node-modules and Corepack enable documentation.'
+    suggested_action: 'Add .yarnrc.yml; document corepack enable in local/CI.'
+  - id: 'TOOL-002'
+    severity: high
+    finding: 'No workspaces defined for apps/* and packages/* in root package.json.'
+    suggested_action: 'Add "workspaces": ["apps/*", "packages/*"].'
+  - id: 'CI-001'
+    severity: medium
+    finding: 'CI lacks Yarn/Node caching and yarn install --immutable enforcement.'
+    suggested_action: 'Add cache steps and enforce immutable installs.'
+
+risk_summary:
+  totals: { critical: 0, high: 2, medium: 1, low: 0 }
+  recommendations:
+    must_fix:
+      - 'Establish Yarn 3 workspaces + immutable installs.'
+      - 'Add .yarnrc.yml with nodeLinker and Corepack guidance.'
+    monitor:
+      - 'Optimize CI cache to reduce build time.'

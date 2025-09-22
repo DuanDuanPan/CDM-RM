@@ -1,0 +1,20 @@
+{
+  "name": "cdm-architecture",
+  "private": true,
+  "packageManager": "yarn@3.6.1",
+  "engines": { "node": ">=20 <21" },
+  "scripts": {
+    "api:openapi": "node scripts/export-openapi.js",
+    "api:spectral": "spectral lint docs/openapi.json",
+    "api:diff": "openapi diff docs/openapi.baseline.json docs/openapi.json || true",
+    "api:types": "openapi-typescript docs/openapi.json -o packages/api-types/src/index.ts",
+    "api:client": "openapi-typescript-codegen --input docs/openapi.json --output packages/api-client --client axios --useOptions"
+  },
+  "devDependencies": {
+    "@redocly/openapi-cli": "^1.0.0",
+    "@stoplight/spectral-cli": "^6.0.0",
+    "openapi-typescript": "^7.0.0",
+    "openapi-typescript-codegen": "^0.27.0"
+  }
+}
+

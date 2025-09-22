@@ -1,0 +1,17 @@
+[
+  {
+    "id": "JOB-IMP-ENG-0001",
+    "type": "import",
+    "status": "running",
+    "progress": 45,
+    "steps": [
+      { "name": "upload", "status": "done" },
+      { "name": "validate", "status": "done" },
+      { "name": "parse", "status": "running" },
+      { "name": "deduplicate", "status": "pending" },
+      { "name": "preview", "status": "pending" },
+      { "name": "write-baseline", "status": "pending" }
+    ],
+    "context": { "domain": "aero-engine", "module": "MOD-ENGINE-01" }
+  }
+]

@@ -1,0 +1,11 @@
+[
+  { "id": "PART-ENG-ROOT", "name": "发动机总成", "baselineId": "BL-0001" },
+  { "id": "PART-FAN", "name": "风扇（FAN）", "parentId": "PART-ENG-ROOT", "baselineId": "BL-0001" },
+  { "id": "PART-LPC", "name": "低压压气机（LPC）", "parentId": "PART-ENG-ROOT", "baselineId": "BL-0001" },
+  { "id": "PART-HPC", "name": "高压压气机（HPC）", "parentId": "PART-ENG-ROOT", "baselineId": "BL-0001" },
+  { "id": "PART-COMB", "name": "燃烧室", "parentId": "PART-ENG-ROOT", "baselineId": "BL-0001" },
+  { "id": "PART-HPT", "name": "高压涡轮（HPT）", "parentId": "PART-ENG-ROOT", "baselineId": "BL-0001" },
+  { "id": "PART-LPT", "name": "低压涡轮（LPT）", "parentId": "PART-ENG-ROOT", "baselineId": "BL-0001" },
+  { "id": "PART-FADEC", "name": "FADEC 控制单元", "parentId": "PART-ENG-ROOT", "baselineId": "BL-0001" },
+  { "id": "PART-FUEL", "name": "燃油系统", "parentId": "PART-ENG-ROOT", "baselineId": "BL-0001" }
+]

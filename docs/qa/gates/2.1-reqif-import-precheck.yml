@@ -1,0 +1,24 @@
+schema: 1
+story: '2.1'
+story_title: 'REQIF 导入与预检'
+gate: 'CONCERNS'
+status_reason: 'Initial gate: assessments present; awaiting implementation and validations.'
+reviewer: 'Quinn (Test Architect)'
+updated: '2025-09-22T06:52:26.100892+00:00'
+
+waiver: { active: false }
+
+top_issues:
+  - id: 'IMP-REQIF-001'
+    severity: medium
+    finding: '文件类型/大小/安全预检与流式解析未验证完备。'
+    suggested_action: '按测试设计覆盖预检/流式/错误隔离场景并通过。'
+
+risk_summary:
+  totals: { critical: 0, high: 0, medium: 1, low: 0 }
+  recommendations:
+    must_fix:
+      - '实现并验证 AC（预检/导入），消除 NFR CONCERNS。'
+    monitor:
+      - '大文件性能与内存峰值。'
+

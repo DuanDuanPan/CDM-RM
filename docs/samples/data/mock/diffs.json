@@ -1,0 +1,11 @@
+[
+  {
+    "id": "DIFF-ENG-0001",
+    "severity": "high",
+    "objectType": "requirement",
+    "objectId": "REQ-ENG-0001",
+    "changeType": "update",
+    "summary": "最大起飞推力目标由 120 kN 调整为 125 kN，需评估风扇与低压级裕度",
+    "createdAt": "2025-09-15T09:00:00Z"
+  }
+]

@@ -1,0 +1,258 @@
+// Prisma schema draft for CDM MVP (Postgres)
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Requirement {
+  id                 String   @id @default(cuid())
+  moduleId           String
+  objectId           String
+  baselineId         String
+  title              String
+  content            String
+  status             String   // draft|in_review|frozen|changing|closed
+  priority           String   // P0|P1|P2|P3
+  verificationMethod String?
+  dedupeHash         String   @unique
+  extras             Json?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  metrics            Metric[]
+  bindings           RequirementRbomBinding[]
+  verifications      Verification[]
+
+  @@index([moduleId, objectId, baselineId])
+}
+
+model Metric {
+  id             String   @id @default(cuid())
+  requirementId  String
+  name           String
+  value          Float?
+  unit           String?
+  normalizedUnit String?
+  lower          Float?
+  lowerInc       Boolean?
+  upper          Float?
+  upperInc       Boolean?
+  method         String   // rule|regex|dict|llm|manual
+  confidence     Float?
+  sourceFragment String?
+  extras         Json?
+
+  requirement Requirement @relation(fields: [requirementId], references: [id])
+
+  @@index([requirementId])
+  @@index([name])
+}
+
+model RbomNode {
+  id         String  @id @default(cuid())
+  code       String
+  name       String
+  level      Int
+  parentId   String?
+  path       String
+  baselineId String?
+  extras     Json?
+
+  bindings RequirementRbomBinding[]
+
+  @@index([parentId])
+  @@unique([code, baselineId])
+}
+
+model RequirementRbomBinding {
+  id            String  @id @default(cuid())
+  requirementId String
+  rbomNodeId    String
+  baselineId    String?
+  createdAt     DateTime @default(now())
+
+  requirement Requirement @relation(fields: [requirementId], references: [id])
+  rbomNode    RbomNode   @relation(fields: [rbomNodeId], references: [id])
+
+  @@unique([requirementId, rbomNodeId, baselineId])
+}
+
+model Diff {
+  id             String   @id @default(cuid())
+  type           String   // added|modified|deleted
+  severity       String   // high|medium|low
+  targetType     String   // requirement|metric|rbom|other
+  targetId       String
+  before         Json?
+  after          Json?
+  description    String?
+  detectedAt     DateTime @default(now())
+  changePackageId String?
+
+  changePackage ChangePackage? @relation(fields: [changePackageId], references: [id])
+
+  @@index([changePackageId])
+  @@index([severity])
+  @@index([targetType])
+}
+
+model ChangePackage {
+  id        String   @id @default(cuid())
+  title     String
+  ownerId   String
+  severity  String   // high|medium|low
+  status    String   // draft|in_progress|pending_verification|completed|closed
+  createdAt DateTime @default(now())
+  dueAt     DateTime?
+
+  orders   ChangeOrder[]
+  diffs    Diff[]
+  closure  Closure?
+
+  @@index([ownerId])
+  @@index([status])
+}
+
+model ChangeOrder {
+  id             String   @id @default(cuid())
+  changePackageId String
+  title          String
+  assigneeId     String
+  status         String   // draft|in_progress|pending_verification|completed|closed
+  createdAt      DateTime @default(now())
+  dueAt          DateTime?
+
+  changePackage ChangePackage @relation(fields: [changePackageId], references: [id])
+
+  @@index([assigneeId])
+  @@index([status])
+}
+
+model Notification {
+  id         String   @id @default(cuid())
+  channel    String   // inbox|oa
+  recipientUserId String?
+  recipientRole   String?
+  title      String
+  body       String
+  sentAt     DateTime @default(now())
+  readAt     DateTime?
+  confirmedAt DateTime?
+  relatedType String?
+  relatedId   String?
+
+  @@index([recipientUserId])
+  @@index([recipientRole])
+  @@index([sentAt])
+}
+
+model WorkPackage {
+  id             String   @id @default(cuid())
+  changePackageId String
+  assigneeId     String
+  status         String   // issued|in_progress|done|closed
+  issuedAt       DateTime @default(now())
+  ackAt          DateTime?
+
+  changePackage ChangePackage @relation(fields: [changePackageId], references: [id])
+  acks          Acknowledgement[]
+  deliverables  Deliverable[]
+
+  @@index([assigneeId])
+  @@index([status])
+}
+
+model Acknowledgement {
+  id            String   @id @default(cuid())
+  workPackageId String
+  userId        String
+  ackAt         DateTime @default(now())
+  status        String   // acknowledged|rejected
+  reason        String?
+
+  workPackage WorkPackage @relation(fields: [workPackageId], references: [id])
+}
+
+model Deliverable {
+  id            String   @id @default(cuid())
+  workPackageId String
+  url           String
+  metadata      Json?
+  uploadedAt    DateTime @default(now())
+  checksum      String?
+
+  workPackage WorkPackage @relation(fields: [workPackageId], references: [id])
+}
+
+model Verification {
+  id            String   @id @default(cuid())
+  requirementId String?
+  metricId      String?
+  method        String   // test|analysis|inspection|demonstration
+  outcome       String   // passed|failed|blocked
+  evidenceUrls  Json?
+  verifiedBy    String
+  verifiedAt    DateTime @default(now())
+  notes         String?
+
+  requirement Requirement? @relation(fields: [requirementId], references: [id])
+}
+
+model Closure {
+  id             String   @id @default(cuid())
+  changePackageId String  @unique
+  summary        String
+  result         String   // passed|partially_passed|failed
+  closedAt       DateTime @default(now())
+
+  changePackage ChangePackage @relation(fields: [changePackageId], references: [id])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  who       Json?
+  when      DateTime @default(now())
+  action    String
+  target    Json?
+  before    Json?
+  after     Json?
+  traceId   String?
+  viewId    String?
+  clientIp  String?
+
+  @@index([when])
+  @@index([viewId])
+  @@index([traceId])
+}
+
+model Lookup {
+  id      String  @id @default(cuid())
+  domain  String
+  key     String
+  value   String
+  locale  String?
+  version String?
+
+  @@index([domain])
+}
+
+model MetaRequirementField {
+  id       String  @id @default(cuid())
+  module   String
+  key      String
+  label    String
+  type     String // text|richtext|number|boolean|date|enum|multiselect|ref
+  required Boolean?
+  visible  Boolean?
+  options  Json?
+  order    Int?
+  createdAt DateTime @default(now())
+
+  @@index([module])
+  @@unique([module, key])
+}
+

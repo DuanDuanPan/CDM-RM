@@ -1,0 +1,24 @@
+schema: 1
+story: '5.1'
+story_title: '由差异派生更改单/变更包'
+gate: 'CONCERNS'
+status_reason: 'Initial gate: 派生规则与聚合准确性、审计待验证。'
+reviewer: 'Quinn (Test Architect)'
+updated: '2025-09-22T06:52:26.100892+00:00'
+
+waiver: { active: false }
+
+top_issues:
+  - id: 'AGG-001'
+    severity: medium
+    finding: '错误聚合导致错包风险。'
+    suggested_action: '回放样本并核对审计与幂等。'
+
+risk_summary:
+  totals: { critical: 0, high: 0, medium: 1, low: 0 }
+  recommendations:
+    must_fix:
+      - '固化派生与聚合策略。'
+    monitor:
+      - '边界和回滚。'
+

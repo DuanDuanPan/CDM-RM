@@ -1,0 +1,31 @@
+schema: 1
+story: '1.2'
+story_title: '代码规范与提交检查'
+gate: 'CONCERNS'
+status_reason: 'ESLint/Prettier/Husky/lint-staged not configured; only commitlint present.'
+reviewer: 'Quinn (Test Architect)'
+updated: '2025-09-22T06:52:26.100892+00:00'
+
+waiver: { active: false }
+
+top_issues:
+  - id: 'LINT-001'
+    severity: high
+    finding: 'ESLint not installed/configured; no lint script.'
+    suggested_action: 'Add ESLint with TS/React/Promise/Prettier plugins and lint script.'
+  - id: 'FMT-001'
+    severity: high
+    finding: 'Prettier not configured; no format scripts.'
+    suggested_action: 'Add Prettier config and `prettier:check`/`prettier:write` scripts.'
+  - id: 'HUSKY-001'
+    severity: medium
+    finding: 'No Husky/lint-staged pre-commit automation.'
+    suggested_action: 'Configure pre-commit to run eslint --fix and prettier -w.'
+
+risk_summary:
+  totals: { critical: 0, high: 2, medium: 1, low: 0 }
+  recommendations:
+    must_fix:
+      - 'Introduce ESLint/Prettier with pre-commit enforcement.'
+    monitor:
+      - 'Ensure CI includes lint and format checks.'

@@ -1,0 +1,10 @@
+[
+  {
+    "id": "CHG-ENG-0001",
+    "severity": "medium",
+    "ownerId": "team:propulsion",
+    "status": "in_progress",
+    "deadline": "2025-10-01T00:00:00Z",
+    "note": "因推力上调，风扇叶片与齿轮箱工况评估；同步更新试验计划"
+  }
+]

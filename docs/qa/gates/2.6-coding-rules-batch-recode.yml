@@ -1,0 +1,24 @@
+schema: 1
+story: '2.6'
+story_title: '编码规则与批量重编码'
+gate: 'CONCERNS'
+status_reason: 'Initial gate: 规则正确性与批量任务幂等/限速待验证。'
+reviewer: 'Quinn (Test Architect)'
+updated: '2025-09-22T06:52:26.100892+00:00'
+
+waiver: { active: false }
+
+top_issues:
+  - id: 'RECODE-001'
+    severity: medium
+    finding: '批量重编码的失败重试、并发与冲突处理未覆盖。'
+    suggested_action: '补齐状态机/重试/黑名单策略测试。'
+
+risk_summary:
+  totals: { critical: 0, high: 0, medium: 1, low: 0 }
+  recommendations:
+    must_fix:
+      - '实现/验证限速与幂等策略。'
+    monitor:
+      - '数据一致性与回滚脚本。'
+

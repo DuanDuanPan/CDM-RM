@@ -1,0 +1,24 @@
+schema: 1
+story: '4.5'
+story_title: 'RBOM 基线管理'
+gate: 'CONCERNS'
+status_reason: 'Initial gate: 基线生成/冻结与版本审计、差异对比需验证。'
+reviewer: 'Quinn (Test Architect)'
+updated: '2025-09-22T06:52:26.100892+00:00'
+
+waiver: { active: false }
+
+top_issues:
+  - id: 'RBOM-DIFF-001'
+    severity: medium
+    finding: '差异对比正确性与回滚通路未验证。'
+    suggested_action: '对齐评审中 NFR/测试设计并通过。'
+
+risk_summary:
+  totals: { critical: 0, high: 0, medium: 1, low: 0 }
+  recommendations:
+    must_fix:
+      - '固化基线与 diff 流程。'
+    monitor:
+      - '仓库体量增长影响。'
+

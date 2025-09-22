@@ -1,0 +1,24 @@
+schema: 1
+story: '4.2'
+story_title: 'LLM 抽取 Job 与审计'
+gate: 'CONCERNS'
+status_reason: 'Initial gate: 审计、重试与成本控制需验证；输出一致性待测。'
+reviewer: 'Quinn (Test Architect)'
+updated: '2025-09-22T06:52:26.100892+00:00'
+
+waiver: { active: false }
+
+top_issues:
+  - id: 'LLM-JOB-001'
+    severity: medium
+    finding: '审计/幂等/重复调用与成本未评估。'
+    suggested_action: '加入重试/去重/审计与预算报警测试。'
+
+risk_summary:
+  totals: { critical: 0, high: 0, medium: 1, low: 0 }
+  recommendations:
+    must_fix:
+      - '固化作业状态机与审计字段。'
+    monitor:
+      - '输出质量与漂移。'
+

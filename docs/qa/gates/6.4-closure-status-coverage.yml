@@ -1,0 +1,40 @@
+schema: 1
+story: '6.4'
+story_title: '闭环状态与覆盖'
+gate: 'CONCERNS'
+status_reason: 'Initial gate: 闭环计算/覆盖口径一致性与互链完整性需验证。'
+reviewer: 'Quinn (Test Architect)'
+updated: '2025-09-22T06:52:26.100892+00:00'
+
+waiver: { active: false }
+
+top_issues:
+  - id: 'CLOSURE-STATE-001'
+    severity: medium
+    finding: '跨批次合并与幂等、口径漂移风险。'
+    suggested_action: '实现重算触发与合并策略测试；校验互链。'
+
+risk_summary:
+  totals: { critical: 0, high: 0, medium: 1, low: 0 }
+  recommendations:
+    must_fix:
+      - '消除一致性隐患并补齐审计。'
+    monitor:
+      - '大规模回归下性能。'
+
+quality_gates:
+  - id: CLOSURE-CORR-001
+    area: reliability
+    metric: '闭环状态与最新有效结果一致性（跨批次合并）'
+    threshold: '100% 样本一致；跳过不计入；重跑取最新有效'
+    validation: '合并策略回放 + 审计对齐'
+  - id: COVERAGE-FORM-001
+    area: maintainability
+    metric: '覆盖率口径配置化与正确性'
+    threshold: '按需求/按用例 两种口径均正确；切换后重算触发'
+    validation: '单元函数 + 集成重算触发用例'
+  - id: TRACE-INTEG-001
+    area: reliability
+    metric: '互链完整性（需求↔指标↔用例↔批次）'
+    threshold: '缺失/断链=0；完整性校验全绿'
+    validation: '校验器作业 + 报告存档'

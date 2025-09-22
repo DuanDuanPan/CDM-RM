@@ -1,0 +1,24 @@
+schema: 1
+story: '2.5'
+story_title: 'SRS 导入/导出（DOC/DOCX）'
+gate: 'CONCERNS'
+status_reason: 'Initial gate: 文档解析/导出一致性与兼容性待验证。'
+reviewer: 'Quinn (Test Architect)'
+updated: '2025-09-22T06:52:26.100892+00:00'
+
+waiver: { active: false }
+
+top_issues:
+  - id: 'DOCX-IMP-001'
+    severity: medium
+    finding: '边界样本（表格/图片/编号/超链接）解析未覆盖。'
+    suggested_action: '增加样本集与回放比对；导出对齐规范。'
+
+risk_summary:
+  totals: { critical: 0, high: 0, medium: 1, low: 0 }
+  recommendations:
+    must_fix:
+      - '通过大样本解析/导出一致性测试。'
+    monitor:
+      - '性能与内存峰值。'
+

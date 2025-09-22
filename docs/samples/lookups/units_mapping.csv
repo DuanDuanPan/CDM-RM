@@ -1,0 +1,18 @@
+original_unit,target_unit,dimension,rule,notes
+mm,m,length,/1000,adopted
+cm,m,length,/100,adopted
+in,m,length,*0.0254,adopted
+g,kg,mass,/1000,adopted
+kg,kg,mass,1:1,adopted
+N,N,force,1:1,adopted
+kN,N,force,*1000,adopted
+N·m,N·m,torque,1:1,adopted
+Pa,Pa,pressure,1:1,adopted
+kPa,Pa,pressure,*1000,adopted
+MPa,Pa,pressure,*1000000,adopted
+bar,Pa,pressure,*100000,adopted
+psi,Pa,pressure,*6894.757,adopted
+mm/s,m/s,speed,/1000,adopted
+km/h,m/s,speed,/3.6,adopted
+°C,°C,temperature,1:1,primary scale
+

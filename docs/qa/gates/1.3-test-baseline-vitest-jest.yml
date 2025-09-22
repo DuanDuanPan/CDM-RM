@@ -1,0 +1,31 @@
+schema: 1
+story: '1.3'
+story_title: '测试基线（Vitest/Jest）'
+gate: 'CONCERNS'
+status_reason: 'No test runner/config/scripts found; coverage and CI matrix missing.'
+reviewer: 'Quinn (Test Architect)'
+updated: '2025-09-22T06:52:26.100892+00:00'
+
+waiver: { active: false }
+
+top_issues:
+  - id: 'TEST-001'
+    severity: high
+    finding: 'No Vitest/Jest setup or scripts.'
+    suggested_action: 'Install and configure Vitest for web and Jest/Vitest for api.'
+  - id: 'TEST-002'
+    severity: medium
+    finding: 'No coverage setup.'
+    suggested_action: 'Add coverage scripts and thresholds; collect in CI.'
+  - id: 'CI-TEST-001'
+    severity: medium
+    finding: 'CI lacks test matrix and execution.'
+    suggested_action: 'Add minimal matrix and run test:client / test:server.'
+
+risk_summary:
+  totals: { critical: 0, high: 1, medium: 2, low: 0 }
+  recommendations:
+    must_fix:
+      - 'Introduce test runners and minimal suites.'
+    monitor:
+      - 'Optimize coverage thresholds and CI times.'

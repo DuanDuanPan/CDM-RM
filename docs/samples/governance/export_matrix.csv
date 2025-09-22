@@ -1,0 +1,10 @@
+role,resource,columns_visible,formats_allowed,watermark,approval_required,retention_days,notes
+requirements_engineer,requirements,"id,title,status,moduleId,baselineId,owner",CSV|XLSX|MD,ON,false,30,"最小可见字段；敏感列默认隐藏"
+requirements_engineer,metrics,"id,requirementId,name,unit,value,confidence,status",CSV|XLSX,ON,false,30,
+qa_engineer,diffs,"id,severity,objectType,changeType,summary,createdAt",CSV|MD|PDF,ON,false,60,"PDF 含水印"
+qa_engineer,regression_batches,"id,level,passRate,blockers",CSV|MD,ON,false,60,
+admin,requirements,"*",CSV|XLSX|MD|PDF,ON,true,180,"解锁敏感列需审批"
+admin,audit_logs,"timestamp,user,action,resource,scope,result,count",CSV|MD,ON,false,365,"仅管理员可导出"
+viewer,requirements,"id,title,status",MD,ON,false,7,"只读，限制格式"
+viewer,export_reports,"id,name,createdAt",MD,ON,false,7,
+

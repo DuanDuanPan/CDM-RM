@@ -1,0 +1,24 @@
+schema: 1
+story: '3.7'
+story_title: '导出映射与水印/脱敏'
+gate: 'CONCERNS'
+status_reason: 'Initial gate: 导出口径与脱敏/水印一致性需验证。'
+reviewer: 'Quinn (Test Architect)'
+updated: '2025-09-22T06:52:26.100892+00:00'
+
+waiver: { active: false }
+
+top_issues:
+  - id: 'EXPORT-SEC-001'
+    severity: medium
+    finding: '导出字段白名单/脱敏规则与页面不一致风险。'
+    suggested_action: '对齐导出与视图逻辑，加入审计。'
+
+risk_summary:
+  totals: { critical: 0, high: 0, medium: 1, low: 0 }
+  recommendations:
+    must_fix:
+      - '实现白名单/脱敏校验并测试通过。'
+    monitor:
+      - '导出性能与大数据量分页。'
+

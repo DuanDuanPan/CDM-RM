@@ -1,0 +1,27 @@
+schema: 1
+story: '1.8'
+story_title: '健康检查与金丝雀'
+gate: 'CONCERNS'
+status_reason: 'No health check route or canary page implemented.'
+reviewer: 'Quinn (Test Architect)'
+updated: '2025-09-22T06:52:26.100892+00:00'
+
+waiver: { active: false }
+
+top_issues:
+  - id: 'HC-001'
+    severity: high
+    finding: 'Missing /api/__health_check with version/timezone.'
+    suggested_action: 'Implement route and smoke test post-deploy.'
+  - id: 'CAN-001'
+    severity: medium
+    finding: 'No canary page/route showing build info.'
+    suggested_action: 'Add simple page with env/version/time.'
+
+risk_summary:
+  totals: { critical: 0, high: 1, medium: 1, low: 0 }
+  recommendations:
+    must_fix:
+      - 'Provide health check and canary for post-deploy validation.'
+    monitor:
+      - 'Keep health endpoint lightweight with minimal dependencies.'

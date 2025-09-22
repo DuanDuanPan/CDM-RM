@@ -1,0 +1,70 @@
+name: Quality Gates
+on:
+  pull_request:
+    branches: [main, next, develop]
+  push:
+    branches: [main, next, develop]
+
+concurrency:
+  group: quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node & Corepack
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+      - run: corepack enable
+      - run: yarn --version
+      - run: yarn install --immutable
+      - name: Prepare reports dir
+        run: mkdir -p reports
+      - name: Export OpenAPI
+        run: yarn api:openapi
+      - name: Spectral lint
+        run: npx @stoplight/spectral-cli lint docs/openapi.json --format sarif -o reports/spectral.sarif
+      - name: OpenAPI diff (vs baseline)
+        run: |
+          if [ -f docs/openapi.baseline.json ]; then \
+            npx @redocly/openapi-cli@latest diff docs/openapi.baseline.json docs/openapi.json > reports/openapi-diff.txt || true; \
+          else \
+            echo 'No baseline found' > reports/openapi-diff.txt; \
+          fi
+      - name: Generate Types & Client
+        run: |
+          yarn api:types
+          yarn api:client
+      - name: Upload contract artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: contracts
+          path: |
+            docs/openapi.json
+            reports/spectral.sarif
+            reports/openapi-diff.txt
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: gitleaks scan
+        uses: gitleaks/gitleaks-action@v2
+        with:
+          args: detect --no-git -v --report-path reports/gitleaks.sarif --format sarif
+      - name: OSV scan (lockfile + workspace)
+        uses: google/osv-scanner-action@v1
+        with:
+          scan-args: >-
+            --lockfile=./yarn.lock
+            --recursive .
+      - name: Upload security artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: security
+          path: reports/
+

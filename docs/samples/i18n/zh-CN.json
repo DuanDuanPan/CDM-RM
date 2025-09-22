@@ -1,0 +1,87 @@
+{
+  "nav": {
+    "dashboard": "仪表盘",
+    "requirements": "需求",
+    "metrics": "指标",
+    "rbom": "RBOM",
+    "changes": "变更",
+    "regression": "回归",
+    "integration": "集成",
+    "audit": "审计",
+    "system": "系统"
+  },
+  "search": {
+    "placeholder": "搜索编号/标题/模块...",
+    "help": "? 打开快捷键说明"
+  },
+  "state": {
+    "loading": "正在加载...",
+    "empty": "暂无数据",
+    "error": "加载失败，请重试",
+    "retry": "重试"
+  },
+  "confirm": {
+    "delete": {"title": "确认删除？", "body": "此操作不可撤销"},
+    "export": {"title": "确认导出？（已应用列权限与水印）"}
+  },
+  "toast": {
+    "success": "操作成功",
+    "error": "操作失败",
+    "copied": "已复制到剪贴板",
+    "deepLinkCopied": "已复制深链"
+  },
+  "a11y": {"skip": "跳至主内容", "focusRing": "已聚焦"},
+  "kb": {"help": {"title": "快捷键帮助"}},
+
+  "dashboard": {
+    "title": "发动机研制仪表盘",
+    "subtitle": "关键达标率与最新作业",
+    "empty": "暂无作业，上传 REQIF 开始",
+    "kpi": {"empty": "暂无 KPI 数据"}
+  },
+  "kpi": {
+    "thrust_pass_rate": "起飞推力达标率",
+    "tsfc_pass_rate": "巡航 TSFC 达标率",
+    "emission_items": "排放达标项",
+    "ground_test_pass_rate": "地面试车通过率"
+  },
+  "quick": {"import": "导入 REQIF", "review": "指标复核", "bind": "RBOM 绑定", "diff": "查看差异"},
+  "jobs": {"title": "最近作业"},
+  "job": {"status": {"running": "进行中"}, "cancel": "取消", "retry": "重试", "resume": "从上次进度继续", "waiting": "等待输入"},
+
+  "requirements": {
+    "title": "需求列表",
+    "empty": "暂无需求",
+    "loading": "正在加载需求...",
+    "detail": {"title": "需求详情"}
+  },
+  "filter": {"category": "类别", "module": "模块", "baseline": "基线", "severity": "级别", "source": "来源"},
+  "col": {"id": "编号", "category": "类别", "title": "标题", "status": "状态", "module": "模块", "baseline": "基线", "updatedAt": "更新时间"},
+  "toolbar": {"bulkSelect": "批量选择", "export": "导出", "routeChange": "派发更改单", "columns": "列设置"},
+  "hint": {"shortcuts": "/ 搜索，Space 选择，Enter 详情，? 查看帮助"},
+  "breadcrumb": {"requirements": "需求", "detail": "详情"},
+  "tab": {"content": "内容", "trace": "追溯", "versions": "版本", "dup": "查重冲突"},
+  "action": {"bind": "绑定到部件", "deriveChange": "派生更改单", "copyDeepLink": "复制深链"},
+  "deeplink": {"missing": "对象不存在或已移动", "forbidden": "权限不足", "copy": "复制深链", "copied": "已复制", "return": "返回列表", "restore": "已根据查询条件恢复视图"},
+
+  "metrics": {"title": "指标抽取与复核", "extract": "抽取任务", "dictionary": "词典/规则", "review": "复核队列"},
+  "review": {"source": "来源片段", "result": "抽取结果", "confidence": "置信度", "approve": "批准", "reject": "退回", "batchApprove": "批量批准", "batchReject": "批量退回"},
+
+  "rbom": {"title": "RBOM 绑定", "tip": "从左侧选择部件，右侧完成绑定/撤销", "search": "搜索部件", "bind": "绑定", "unbind": "撤销", "suggest": "建议绑定", "compare": "基线对比", "baseline": "当前基线：{id}", "empty": "暂无部件数据"},
+
+  "changes": {"title": "差异与更改单", "empty": "暂无差异", "loading": "正在加载差异..."},
+  "diff": {"mode": {"sideBySide": "并排", "inline": "行内"}, "filter": "过滤", "copy": "复制片段", "deriveChange": "派生更改单", "group": {"bySeverity": "按级别", "bySource": "按来源"}},
+
+  "regression": {"title": "回归批次", "board": "看板", "passRate": "通过率", "blockers": "阻塞项", "level": "批次级别", "toFailure": "查看失败详情"},
+
+  "integration": {"title": "集成中心", "reqif": "REQIF 导入", "dxl": "DXL 模拟同步", "writeback": "DOORS 反写", "srs": "SRS 导入/导出"},
+  "wizard": {"upload": "上传", "validate": "校验", "parse": "解析", "dedupe": "去重/溯源", "preview": "预览", "write": "写入基线", "errorAt": "第 {row} 行/第 {col} 列", "fixHint": "修复建议：{hint}", "start": "开始导入", "next": "下一步", "back": "上一步", "finish": "写入", "cancel": "取消", "retry": "重试"},
+
+  "audit": {"title": "操作审计", "export": "导出治理", "watermarkPreview": "水印预览", "minVisible": "最小可见字段", "col": {"user": "用户", "action": "操作", "resource": "资源", "scope": "范围", "result": "结果", "count": "次数"}},
+
+  "system": {"rbac": "RBAC", "views": "视图与列模板", "codingRules": "编码规则", "metamodel": "元模型/字段配置", "env": "环境"},
+  "form": {"rule": {"prefix": "前缀", "width": "位数", "checksum": "校验规则"}, "view": {"columns": "列集合"}, "metamodel": {"entity": "实体", "field": "字段"}},
+
+  "fmt": {"percent": "0.0%", "number": "0.##", "time": "YYYY-MM-DD HH:mm", "unit": "{value} {unit}"}
+}
+

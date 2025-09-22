@@ -1,0 +1,40 @@
+schema: 1
+story: '4.6'
+story_title: '差异生成与导出'
+gate: 'CONCERNS'
+status_reason: 'Initial gate: 差异分类/字段与对接导出正确性待验证。'
+reviewer: 'Quinn (Test Architect)'
+updated: '2025-09-22T06:52:26.100892+00:00'
+
+waiver: { active: false }
+
+top_issues:
+  - id: 'DIFF-ACC-001'
+    severity: medium
+    finding: '分类/字段不准确与导出格式对接风险。'
+    suggested_action: '补全对比样本与导出契约测试。'
+
+risk_summary:
+  totals: { critical: 0, high: 0, medium: 1, low: 0 }
+  recommendations:
+    must_fix:
+      - '稳定 diff 逻辑并对接下游。'
+    monitor:
+      - '性能与队列拥塞。'
+
+quality_gates:
+  - id: DIFF-ACC-001
+    area: reliability
+    metric: '差异对比准确率（对黄金样本）'
+    threshold: '>= 99.5% 字段级匹配（新增/变更/删除 分类与 payload）'
+    validation: '基线样本 50+ 文档回放；逐字段比对报告生成'
+  - id: DIFF-SCHEMA-001
+    area: maintainability
+    metric: '导出契约校验'
+    threshold: 'JSON Schema 全量通过；无 breaking change'
+    validation: 'CI 契约校验 + Spectral（如适用）'
+  - id: DIFF-PERF-001
+    area: performance
+    metric: '差异生成性能（中等文档 5MB）'
+    threshold: 'P95 ≤ 2s；P99 ≤ 3s'
+    validation: '基准脚本 + 夜间回归趋势'

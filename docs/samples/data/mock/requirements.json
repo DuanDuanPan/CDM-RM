@@ -1,0 +1,129 @@
+[
+  {
+    "id": "REQ-ENG-0001",
+    "moduleId": "MOD-ENGINE-01",
+    "baselineId": "BL-0001",
+    "status": "approved",
+    "category": "PR",
+    "title": "最大起飞推力",
+    "content": "发动机在 ISA 海平面静止条件下，应提供不小于 120 kN 的最大起飞推力。",
+    "sourceId": "DOORS:ENG:10001",
+    "hash": "e10a17",
+    "createdAt": "2025-09-10T08:00:00Z",
+    "updatedAt": "2025-09-12T10:00:00Z"
+  },
+  {
+    "id": "REQ-ENG-0002",
+    "moduleId": "MOD-ENGINE-01",
+    "baselineId": "BL-0001",
+    "status": "in_review",
+    "category": "PR",
+    "title": "巡航 TSFC 限值",
+    "content": "巡航工况下单位推力燃油消耗（TSFC）应不高于 0.62 kg/(kN·h)。",
+    "sourceId": "DOORS:ENG:10002",
+    "hash": "9bf3a2",
+    "createdAt": "2025-09-11T08:00:00Z",
+    "updatedAt": "2025-09-12T10:00:00Z"
+  },
+  {
+    "id": "REQ-ENG-0003",
+    "moduleId": "MOD-ENGINE-02",
+    "baselineId": "BL-0001",
+    "status": "approved",
+    "category": "PR",
+    "title": "CAEP/8 排放符合性",
+    "content": "发动机应满足 ICAO CAEP/8 排放限值（NOx/CO/HC/烟度）。",
+    "sourceId": "DOORS:ENG:10003",
+    "hash": "d2102f",
+    "createdAt": "2025-09-12T08:00:00Z",
+    "updatedAt": "2025-09-12T10:00:00Z"
+  },
+  {
+    "id": "REQ-ENG-0004",
+    "moduleId": "MOD-ENGINE-CORE",
+    "baselineId": "BL-0001",
+    "status": "new",
+    "category": "PR",
+    "title": "T4/TIT 限值",
+    "content": "高压涡轮入口温度（T4）名义工况不超过 1750 K，并说明裕度与冷却设计。",
+    "createdAt": "2025-09-12T08:00:00Z",
+    "updatedAt": "2025-09-12T10:00:00Z"
+  },
+  {
+    "id": "REQ-ENG-FR-0001",
+    "moduleId": "MOD-ENGINE-CTRL",
+    "baselineId": "BL-0001",
+    "status": "approved",
+    "category": "FR",
+    "title": "FADEC 控制模式",
+    "content": "FADEC 应提供起动、加速、稳定、减速、关车等控制模式，并支持健康监控与故障降级。",
+    "createdAt": "2025-09-12T08:10:00Z",
+    "updatedAt": "2025-09-12T10:10:00Z"
+  },
+  {
+    "id": "REQ-ENG-IR-0001",
+    "moduleId": "MOD-ENGINE-IF",
+    "baselineId": "BL-0001",
+    "status": "in_review",
+    "category": "IR",
+    "title": "总线与协议",
+    "content": "FADEC 与航电间接口遵循 ARINC 429 与 AFDX，提供发动机参数/告警/控制指令的数据发布与订阅。",
+    "createdAt": "2025-09-12T08:20:00Z",
+    "updatedAt": "2025-09-12T10:20:00Z"
+  },
+  {
+    "id": "REQ-ENG-TR-0001",
+    "moduleId": "MOD-ENGINE-CTRL",
+    "baselineId": "BL-0001",
+    "status": "approved",
+    "category": "TR",
+    "title": "加速响应时间",
+    "content": "从怠速至起飞推力的节气门阶跃，加速时间不超过 5 s，超温/喘振保护生效。",
+    "createdAt": "2025-09-12T08:30:00Z",
+    "updatedAt": "2025-09-12T10:30:00Z"
+  },
+  {
+    "id": "REQ-ENG-XR-REL-0001",
+    "moduleId": "MOD-ENGINE-RAMT",
+    "baselineId": "BL-0001",
+    "status": "approved",
+    "category": "XR",
+    "title": "可靠性（MTBF）",
+    "content": "发动机 MTBF 初期目标 ≥ 1000 h；关键部件寿命分配与可靠性评估需提供。",
+    "createdAt": "2025-09-12T08:40:00Z",
+    "updatedAt": "2025-09-12T10:40:00Z"
+  },
+  {
+    "id": "REQ-ENG-XR-MAINT-0002",
+    "moduleId": "MOD-ENGINE-RAMT",
+    "baselineId": "BL-0001",
+    "status": "in_review",
+    "category": "XR",
+    "title": "维修性（LRU 更换）",
+    "content": "常见 LRU（燃油泵、FADEC）更换时间 ≤ 30 min，所需工具与步骤应标准化。",
+    "createdAt": "2025-09-12T08:45:00Z",
+    "updatedAt": "2025-09-12T10:45:00Z"
+  },
+  {
+    "id": "REQ-ENG-XR-SAFE-0003",
+    "moduleId": "MOD-ENGINE-SAFE",
+    "baselineId": "BL-0001",
+    "status": "approved",
+    "category": "XR",
+    "title": "安全性（单点失效）",
+    "content": "关键测量与执行链路不允许单点失效导致危险状态，应具备冗余与降级控制逻辑。",
+    "createdAt": "2025-09-12T08:50:00Z",
+    "updatedAt": "2025-09-12T10:50:00Z"
+  },
+  {
+    "id": "REQ-ENG-OR-0001",
+    "moduleId": "MOD-ENGINE-DOC",
+    "baselineId": "BL-0001",
+    "status": "new",
+    "category": "OR",
+    "title": "适航文档交付",
+    "content": "提供适航符合性矩阵、试验大纲、测试报告与 SRS/ICD 文档包。",
+    "createdAt": "2025-09-12T08:55:00Z",
+    "updatedAt": "2025-09-12T10:55:00Z"
+  }
+]

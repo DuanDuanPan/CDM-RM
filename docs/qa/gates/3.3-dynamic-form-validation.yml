@@ -1,0 +1,35 @@
+schema: 1
+story: '3.3'
+story_title: '动态表单生成与校验'
+gate: 'CONCERNS'
+status_reason: 'Initial gate: 前后端校验一致性与性能目标待证明。'
+reviewer: 'Quinn (Test Architect)'
+updated: '2025-09-22T06:52:26.100892+00:00'
+
+waiver: { active: false }
+
+top_issues:
+  - id: 'FORM-VAL-001'
+    severity: medium
+    finding: '错误保留/一致错误信息与渲染性能未覆盖。'
+    suggested_action: '按测试设计补齐单元/集成场景，测 P95 ≤200ms。'
+
+risk_summary:
+  totals: { critical: 0, high: 0, medium: 1, low: 0 }
+  recommendations:
+    must_fix:
+      - '统一校验链路并加入性能监测。'
+    monitor:
+      - '复杂表单与异步校验。'
+
+quality_gates:
+  - id: FORM-PERF-001
+    area: performance
+    metric: '表单渲染性能'
+    threshold: 'P95 ≤ 200ms（典型表单）；P99 ≤ 350ms'
+    validation: 'Web 端基准脚本 + CI 轻量检测'
+  - id: VAL-CONS-001
+    area: reliability
+    metric: '前后端校验一致性'
+    threshold: '同一输入集前后端一致率=100%'
+    validation: '共享 schema 回放 + 错误消息一致性检查'

@@ -1,0 +1,7 @@
+doors_value,unified_value,notes
+Highest,P0,alias of Critical
+Critical,P0,
+High,P1,
+Medium,P2,
+Normal,P2,alias of Medium
+

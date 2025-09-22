@@ -1,0 +1,24 @@
+schema: 1
+story: '5.3'
+story_title: 'Ack 收件箱'
+gate: 'CONCERNS'
+status_reason: 'Initial gate: 确认流程/超时/重试与审计需验证。'
+reviewer: 'Quinn (Test Architect)'
+updated: '2025-09-22T06:52:26.100892+00:00'
+
+waiver: { active: false }
+
+top_issues:
+  - id: 'ACK-001'
+    severity: medium
+    finding: '重复确认与超时处理未覆盖。'
+    suggested_action: '实现去重与超时重试策略测试。'
+
+risk_summary:
+  totals: { critical: 0, high: 0, medium: 1, low: 0 }
+  recommendations:
+    must_fix:
+      - '确保可靠交付与审计。'
+    monitor:
+      - '通知风暴与容量。'
+

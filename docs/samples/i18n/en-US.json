@@ -1,0 +1,87 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "requirements": "Requirements",
+    "metrics": "Metrics",
+    "rbom": "RBOM",
+    "changes": "Changes",
+    "regression": "Regression",
+    "integration": "Integration",
+    "audit": "Audit",
+    "system": "System"
+  },
+  "search": {
+    "placeholder": "Search id/title/module...",
+    "help": "? open shortcuts help"
+  },
+  "state": {
+    "loading": "Loading...",
+    "empty": "No data",
+    "error": "Load failed, please retry",
+    "retry": "Retry"
+  },
+  "confirm": {
+    "delete": {"title": "Confirm deletion?", "body": "This action cannot be undone"},
+    "export": {"title": "Confirm export? (column RBAC and watermark applied)"}
+  },
+  "toast": {
+    "success": "Action succeeded",
+    "error": "Action failed",
+    "copied": "Copied to clipboard",
+    "deepLinkCopied": "Deep link copied"
+  },
+  "a11y": {"skip": "Skip to main", "focusRing": "Focused"},
+  "kb": {"help": {"title": "Keyboard Shortcuts"}},
+
+  "dashboard": {
+    "title": "Engine Program Dashboard",
+    "subtitle": "Key pass rates and recent jobs",
+    "empty": "No jobs yet. Upload a REQIF to start",
+    "kpi": {"empty": "No KPI data"}
+  },
+  "kpi": {
+    "thrust_pass_rate": "Takeoff thrust pass rate",
+    "tsfc_pass_rate": "Cruise TSFC pass rate",
+    "emission_items": "Emission compliant items",
+    "ground_test_pass_rate": "Ground test pass rate"
+  },
+  "quick": {"import": "Import REQIF", "review": "Review metrics", "bind": "RBOM binding", "diff": "View diffs"},
+  "jobs": {"title": "Recent Jobs"},
+  "job": {"status": {"running": "Running"}, "cancel": "Cancel", "retry": "Retry", "resume": "Resume", "waiting": "Waiting input"},
+
+  "requirements": {
+    "title": "Requirements List",
+    "empty": "No requirements",
+    "loading": "Loading requirements...",
+    "detail": {"title": "Requirement Detail"}
+  },
+  "filter": {"category": "Category", "module": "Module", "baseline": "Baseline", "severity": "Severity", "source": "Source"},
+  "col": {"id": "ID", "category": "Category", "title": "Title", "status": "Status", "module": "Module", "baseline": "Baseline", "updatedAt": "Updated"},
+  "toolbar": {"bulkSelect": "Bulk select", "export": "Export", "routeChange": "Route change package", "columns": "Columns"},
+  "hint": {"shortcuts": "/ search, Space select, Enter detail, ? help"},
+  "breadcrumb": {"requirements": "Requirements", "detail": "Detail"},
+  "tab": {"content": "Content", "trace": "Trace", "versions": "Versions", "dup": "Duplicates"},
+  "action": {"bind": "Bind to part", "deriveChange": "Derive change package", "copyDeepLink": "Copy deep link"},
+  "deeplink": {"missing": "Object not found or moved", "forbidden": "Permission denied", "copy": "Copy deep link", "copied": "Copied", "return": "Back to list", "restore": "View restored from query"},
+
+  "metrics": {"title": "Metric Extraction & Review", "extract": "Extraction tasks", "dictionary": "Dictionary/Rules", "review": "Review queue"},
+  "review": {"source": "Source snippet", "result": "Extraction", "confidence": "Confidence", "approve": "Approve", "reject": "Reject", "batchApprove": "Batch approve", "batchReject": "Batch reject"},
+
+  "rbom": {"title": "RBOM Binding", "tip": "Pick a part on the left, bind/unbind on the right", "search": "Search part", "bind": "Bind", "unbind": "Unbind", "suggest": "Suggest", "compare": "Baseline compare", "baseline": "Baseline: {id}", "empty": "No parts"},
+
+  "changes": {"title": "Diffs & Change Packages", "empty": "No diffs", "loading": "Loading diffs..."},
+  "diff": {"mode": {"sideBySide": "Side-by-side", "inline": "Inline"}, "filter": "Filter", "copy": "Copy fragment", "deriveChange": "Derive change package", "group": {"bySeverity": "By severity", "bySource": "By source"}},
+
+  "regression": {"title": "Regression Batches", "board": "Board", "passRate": "Pass rate", "blockers": "Blockers", "level": "Level", "toFailure": "View failure"},
+
+  "integration": {"title": "Integration", "reqif": "REQIF Import", "dxl": "DXL Mock Sync", "writeback": "DOORS Write-back", "srs": "SRS Import/Export"},
+  "wizard": {"upload": "Upload", "validate": "Validate", "parse": "Parse", "dedupe": "De-duplicate/Source", "preview": "Preview", "write": "Write baseline", "errorAt": "Row {row} / Col {col}", "fixHint": "Fix hint: {hint}", "start": "Start", "next": "Next", "back": "Back", "finish": "Write", "cancel": "Cancel", "retry": "Retry"},
+
+  "audit": {"title": "Operations Audit", "export": "Export Governance", "watermarkPreview": "Watermark Preview", "minVisible": "Minimal visible fields", "col": {"user": "User", "action": "Action", "resource": "Resource", "scope": "Scope", "result": "Result", "count": "Count"}},
+
+  "system": {"rbac": "RBAC", "views": "Views & Columns", "codingRules": "Coding Rules", "metamodel": "Metamodel/Fields", "env": "Environment"},
+  "form": {"rule": {"prefix": "Prefix", "width": "Width", "checksum": "Checksum"}, "view": {"columns": "Columns"}, "metamodel": {"entity": "Entity", "field": "Field"}},
+
+  "fmt": {"percent": "0.0%", "number": "0.##", "time": "YYYY-MM-DD HH:mm", "unit": "{value} {unit}"}
+}
+

@@ -1,0 +1,35 @@
+schema: 1
+story: '2.8'
+story_title: '审计与幂等'
+gate: 'CONCERNS'
+status_reason: 'Initial gate: 审计字段完整性与幂等键策略待验证。'
+reviewer: 'Quinn (Test Architect)'
+updated: '2025-09-22T06:52:26.100892+00:00'
+
+waiver: { active: false }
+
+top_issues:
+  - id: 'AUD-IMD-001'
+    severity: medium
+    finding: '审计 who/when/what/diff 与幂等键未端到端校验。'
+    suggested_action: '补齐审计链路与重复提交回放测试。'
+
+risk_summary:
+  totals: { critical: 0, high: 0, medium: 1, low: 0 }
+  recommendations:
+    must_fix:
+      - '统一审计模型并验证幂等策略。'
+    monitor:
+      - '日志/存储成本与脱敏。'
+
+quality_gates:
+  - id: AUD-FIELDS-001
+    area: maintainability
+    metric: '审计字段完整性'
+    threshold: 'who/when/what/diff/subject 必填；缺失=0'
+    validation: '单元+集成：事件全链路产生与查询'
+  - id: IDEMP-KEY-001
+    area: reliability
+    metric: '幂等键防重'
+    threshold: '同一幂等键重复提交 N=5 → 落库 1 次；无副作用'
+    validation: '重放测试 + DB 约束校验'

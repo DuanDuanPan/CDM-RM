@@ -1,0 +1,40 @@
+schema: 1
+story: '7.2'
+story_title: '指标对比与风险识别'
+gate: 'CONCERNS'
+status_reason: 'Initial gate: 对比计算/可视化一致性与阈值版本需验证。'
+reviewer: 'Quinn (Test Architect)'
+updated: '2025-09-22T06:52:26.100892+00:00'
+
+waiver: { active: false }
+
+top_issues:
+  - id: 'COMP-ACC-001'
+    severity: medium
+    finding: '缺失值/单位标准化与阈值边界未覆盖完整。'
+    suggested_action: '完善对比/标记回放与导出审计。'
+
+risk_summary:
+  totals: { critical: 0, high: 0, medium: 1, low: 0 }
+  recommendations:
+    must_fix:
+      - '统一计算链并绑定阈值版本。'
+    monitor:
+      - '可视化性能与筛选影响。'
+
+quality_gates:
+  - id: COMP-ACC-001
+    area: reliability
+    metric: '对比计算准确性（单位/缺失/异常处理）'
+    threshold: '黄金样本 RMSE ≤ 1e-6；边界 =/>/< 处理正确'
+    validation: '数值回放 + 边界用例'
+  - id: THRESH-VERS-001
+    area: maintainability
+    metric: '阈值版本绑定'
+    threshold: '每个风险标记包含 threshold_version；版本切换后结果随之变更'
+    validation: '版本切换回放 + 审计校验'
+  - id: EXPORT-SAFE-002
+    area: security
+    metric: '导出脱敏/白名单'
+    threshold: '敏感字段=0；导出=页面可见集合子集'
+    validation: '契约校验 + 基线对比'

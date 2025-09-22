@@ -1,0 +1,31 @@
+schema: 1
+story: '1.4'
+story_title: 'Prisma 基线与迁移'
+gate: 'CONCERNS'
+status_reason: 'Schema present; initial migration and CI migrate/rollback missing.'
+reviewer: 'Quinn (Test Architect)'
+updated: '2025-09-22T06:52:26.100892+00:00'
+
+waiver: { active: false }
+
+top_issues:
+  - id: 'MIG-001'
+    severity: high
+    finding: 'No prisma/migrations/ initial migration committed.'
+    suggested_action: 'Create first migration and ensure reproducible deploy.'
+  - id: 'CI-DB-001'
+    severity: medium
+    finding: 'CI lacks prisma migrate deploy/rollback verification.'
+    suggested_action: 'Add migrate steps and basic rollback/diff checks.'
+  - id: 'IDX-001'
+    severity: medium
+    finding: 'Potential missing GIN index for JSONB extras (if required).'
+    suggested_action: 'Consider raw SQL migration for GIN index based on queries.'
+
+risk_summary:
+  totals: { critical: 0, high: 1, medium: 2, low: 0 }
+  recommendations:
+    must_fix:
+      - 'Create and enforce initial migration via CI.'
+    monitor:
+      - 'Evaluate JSONB index strategy as usage emerges.'

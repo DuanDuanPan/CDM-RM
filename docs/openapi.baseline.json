@@ -1,0 +1,328 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "CDM 需求集成 MVP API",
+    "version": "0.1.0",
+    "description": "MVP 主链路：导入/差异/变更/通知/验证/回归。"
+  },
+  "servers": [
+    { "url": "http://localhost:4000/api", "description": "本地" },
+    { "url": "https://api.example.com/api", "description": "生产/演示" }
+  ],
+  "security": [ { "supabaseJwt": [] } ],
+  "components": {
+    "securitySchemes": {
+      "supabaseJwt": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" }
+    },
+    "schemas": {
+      "ApiError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": { "type": "string" },
+              "message": { "type": "string" },
+              "details": { "type": "object", "additionalProperties": true },
+              "timestamp": { "type": "string", "format": "date-time" },
+              "requestId": { "type": "string" }
+            },
+            "required": ["code", "message"]
+          }
+        },
+        "required": ["error"]
+      },
+      "Requirement": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "source": {
+            "type": "object",
+            "properties": {
+              "moduleId": { "type": "string" },
+              "objectId": { "type": "string" },
+              "baselineId": { "type": "string" }
+            },
+            "required": ["moduleId", "objectId", "baselineId"]
+          },
+          "title": { "type": "string" },
+          "content": { "type": "string" },
+          "status": { "type": "string", "enum": ["draft", "in_review", "frozen", "changing", "closed"] },
+          "priority": { "type": "string", "enum": ["P0", "P1", "P2", "P3"] },
+          "verificationMethod": { "type": "string", "enum": ["test", "analysis", "inspection", "demonstration"] },
+          "dedupeHash": { "type": "string" },
+          "extras": { "type": "object", "additionalProperties": true },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "source", "title", "content", "status", "priority", "dedupeHash", "createdAt", "updatedAt"]
+      },
+      "Metric": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "requirementId": { "type": "string" },
+          "name": { "type": "string" },
+          "value": { "type": "number" },
+          "unit": { "type": "string" },
+          "normalizedUnit": { "type": "string" },
+          "range": {
+            "type": "object",
+            "properties": {
+              "lower": { "type": "number" },
+              "lowerInc": { "type": "boolean" },
+              "upper": { "type": "number" },
+              "upperInc": { "type": "boolean" }
+            }
+          },
+          "method": { "type": "string", "enum": ["rule", "regex", "dict", "llm", "manual"] },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+          "sourceFragment": { "type": "string" },
+          "extras": { "type": "object", "additionalProperties": true }
+        },
+        "required": ["id", "requirementId", "name", "method"]
+      },
+      "RbomNode": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "code": { "type": "string" },
+          "name": { "type": "string" },
+          "level": { "type": "integer" },
+          "parentId": { "type": "string" },
+          "path": { "type": "string" },
+          "baselineId": { "type": "string" },
+          "extras": { "type": "object", "additionalProperties": true }
+        },
+        "required": ["id", "code", "name", "level", "path"]
+      },
+      "RequirementRbomBinding": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "requirementId": { "type": "string" },
+          "rbomNodeId": { "type": "string" },
+          "baselineId": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "requirementId", "rbomNodeId", "createdAt"]
+      },
+      "ChangePackage": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "ownerId": { "type": "string" },
+          "severity": { "type": "string", "enum": ["high", "medium", "low"] },
+          "status": { "type": "string", "enum": ["draft", "in_progress", "pending_verification", "completed", "closed"] },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "dueAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "title", "ownerId", "severity", "status", "createdAt"]
+      },
+      "Diff": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "type": "string", "enum": ["added", "modified", "deleted"] },
+          "severity": { "type": "string", "enum": ["high", "medium", "low"] },
+          "targetType": { "type": "string", "enum": ["requirement", "metric", "rbom", "other"] },
+          "targetId": { "type": "string" },
+          "before": { "type": "object", "additionalProperties": true },
+          "after": { "type": "object", "additionalProperties": true },
+          "description": { "type": "string" },
+          "detectedAt": { "type": "string", "format": "date-time" },
+          "changePackageId": { "type": "string" }
+        },
+        "required": ["id", "type", "severity", "targetType", "targetId", "detectedAt"]
+      },
+      "WorkPackage": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "changePackageId": { "type": "string" },
+          "assigneeId": { "type": "string" },
+          "status": { "type": "string", "enum": ["issued", "in_progress", "done", "closed"] },
+          "issuedAt": { "type": "string", "format": "date-time" },
+          "ackAt": { "type": "string", "format": "date-time" },
+          "items": { "type": "array", "items": { "type": "object", "properties": { "kind": { "type": "string" }, "refId": { "type": "string" } }, "required": ["kind", "refId"] } }
+        },
+        "required": ["id", "changePackageId", "assigneeId", "status", "issuedAt"]
+      },
+      "Acknowledgement": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "workPackageId": { "type": "string" },
+          "userId": { "type": "string" },
+          "ackAt": { "type": "string", "format": "date-time" },
+          "status": { "type": "string", "enum": ["acknowledged", "rejected"] },
+          "reason": { "type": "string" }
+        },
+        "required": ["id", "workPackageId", "userId", "ackAt", "status"]
+      },
+      "Deliverable": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "workPackageId": { "type": "string" },
+          "url": { "type": "string" },
+          "metadata": { "type": "object", "additionalProperties": true },
+          "uploadedAt": { "type": "string", "format": "date-time" },
+          "checksum": { "type": "string" }
+        },
+        "required": ["id", "workPackageId", "url", "uploadedAt"]
+      },
+      "Verification": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "requirementId": { "type": "string" },
+          "metricId": { "type": "string" },
+          "method": { "type": "string", "enum": ["test", "analysis", "inspection", "demonstration"] },
+          "outcome": { "type": "string", "enum": ["passed", "failed", "blocked"] },
+          "evidenceUrls": { "type": "array", "items": { "type": "string" } },
+          "verifiedBy": { "type": "string" },
+          "verifiedAt": { "type": "string", "format": "date-time" },
+          "notes": { "type": "string" }
+        },
+        "required": ["id", "method", "outcome", "verifiedBy", "verifiedAt"]
+      },
+      "Closure": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "changePackageId": { "type": "string" },
+          "summary": { "type": "string" },
+          "result": { "type": "string", "enum": ["passed", "partially_passed", "failed"] },
+          "closedAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "changePackageId", "summary", "result", "closedAt"]
+      }
+    }
+  },
+  "paths": {
+    "/import/reqif": {
+      "post": {
+        "summary": "导入 REQIF（异步）",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": { "type": "string", "format": "binary" },
+                  "options": { "type": "object" }
+                },
+                "required": ["file"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": { "description": "已接受", "content": { "application/json": { "schema": { "type": "object", "properties": { "jobId": { "type": "string" }, "status": { "type": "string" } } }, "example": { "jobId": "job_abc123", "status": "queued" } } } },
+          "400": { "description": "参数错误", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    },
+    "/requirements": {
+      "get": {
+        "summary": "查询系统需求",
+        "parameters": [
+          { "in": "query", "name": "page", "schema": { "type": "integer", "default": 1 } },
+          { "in": "query", "name": "pageSize", "schema": { "type": "integer", "default": 20 } },
+          { "in": "query", "name": "status", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": { "type": "array", "items": { "$ref": "#/components/schemas/Requirement" } },
+                    "page": { "type": "integer" },
+                    "pageSize": { "type": "integer" },
+                    "total": { "type": "integer" }
+                  }
+                },
+                "example": { "items": [ { "id": "SR-001", "source": { "moduleId": "M1", "objectId": "O1", "baselineId": "B1" }, "title": "示例需求", "content": "……", "status": "frozen", "priority": "P1", "verificationMethod": "analysis", "dedupeHash": "abc", "createdAt": "2025-09-22T10:00:00Z", "updatedAt": "2025-09-22T10:00:00Z" } ], "page": 1, "pageSize": 20, "total": 1 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rbom/nodes": {
+      "get": {
+        "summary": "查询 RBOM 节点",
+        "parameters": [ { "in": "query", "name": "parentId", "schema": { "type": "string" } } ],
+        "responses": {
+          "200": { "description": "成功", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/RbomNode" } }, "example": [ { "id": "N1", "code": "P-100", "name": "部件A", "level": 1, "path": "/P-100" } ] } } }
+        }
+      }
+    },
+    "/rbom/bindings": {
+      "post": {
+        "summary": "绑定需求与 RBOM 节点",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RequirementRbomBinding" } } } },
+        "responses": { "201": { "description": "已创建", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RequirementRbomBinding" }, "example": { "id": "bind_1", "requirementId": "SR-001", "rbomNodeId": "N1", "baselineId": "B1", "createdAt": "2025-09-22T10:01:00Z" } } } } }
+      }
+    },
+    "/diffs": {
+      "post": {
+        "summary": "触发差异生成（异步）",
+        "responses": { "202": { "description": "已接受", "content": { "application/json": { "schema": { "type": "object", "properties": { "jobId": { "type": "string" } } }, "example": { "jobId": "job_diffs_1" } } } } }
+      },
+      "get": {
+        "summary": "查询差异",
+        "parameters": [ { "in": "query", "name": "severity", "schema": { "type": "string" } } ],
+        "responses": { "200": { "description": "成功", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Diff" } }, "example": [ { "id": "diff1", "type": "modified", "severity": "high", "targetType": "requirement", "targetId": "SR-001", "description": "状态从 draft 变为 frozen", "detectedAt": "2025-09-22T10:05:00Z" } ] } } } }
+      }
+    },
+    "/changes/packages": {
+      "post": {
+        "summary": "创建变更包",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "properties": { "title": { "type": "string" }, "diffIds": { "type": "array", "items": { "type": "string" } } }, "required": ["title"] } } } },
+        "responses": { "201": { "description": "成功", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ChangePackage" }, "example": { "id": "cp_1", "title": "冻结SR-001", "ownerId": "u_1", "severity": "high", "status": "draft", "createdAt": "2025-09-22T10:10:00Z" } } } } }
+      }
+    },
+    "/notifications/dispatch": {
+      "post": {
+        "summary": "派发通知",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "properties": { "changePackageId": { "type": "string" }, "strategy": { "type": "string" } }, "required": ["changePackageId"] } } } },
+        "responses": { "202": { "description": "已接受", "content": { "application/json": { "schema": { "type": "object", "properties": { "jobId": { "type": "string" } } }, "example": { "jobId": "job_notify_1" } } } } }
+      }
+    },
+    "/work-packages/{id}/ack": {
+      "post": {
+        "summary": "工作包确认",
+        "parameters": [ { "in": "path", "name": "id", "required": true, "schema": { "type": "string" } } ],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Acknowledgement" }, "example": { "id": "ack_1", "workPackageId": "wp_1", "userId": "u_2", "ackAt": "2025-09-22T10:20:00Z", "status": "acknowledged" } } } },
+        "responses": { "200": { "description": "已确认", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Acknowledgement" }, "example": { "id": "ack_1", "workPackageId": "wp_1", "userId": "u_2", "ackAt": "2025-09-22T10:20:00Z", "status": "acknowledged" } } } } }
+      }
+    },
+    "/verifications": {
+      "post": {
+        "summary": "提交验证结果",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Verification" }, "example": { "id": "v_1", "requirementId": "SR-001", "method": "analysis", "outcome": "passed", "verifiedBy": "qa_1", "verifiedAt": "2025-09-22T10:30:00Z" } } } },
+        "responses": { "201": { "description": "已记录", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Verification" } } } } }
+      }
+    },
+    "/deliverables": {
+      "post": {
+        "summary": "上传交付物（记录元信息）",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Deliverable" }, "example": { "id": "d_1", "workPackageId": "wp_1", "url": "https://files.example.com/d1", "uploadedAt": "2025-09-22T10:40:00Z" } } } },
+        "responses": { "201": { "description": "已记录", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Deliverable" } } } } }
+      }
+    },
+    "/closure": {
+      "post": { "summary": "关闭变更包并生成闭环结论", "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Closure" }, "example": { "id": "cl_1", "changePackageId": "cp_1", "summary": "已验证通过", "result": "passed", "closedAt": "2025-09-22T11:00:00Z" } } } }, "responses": { "200": { "description": "已关闭", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Closure" } } } } } }
+    },
+    "/metrics": {
+      "get": { "summary": "Prometheus 指标", "responses": { "200": { "description": "成功", "content": { "text/plain": { "schema": { "type": "string" } } } } } }
+    }
+  }
+}

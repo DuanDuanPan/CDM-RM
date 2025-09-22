@@ -1,0 +1,40 @@
+schema: 1
+story: '7.4'
+story_title: 'Top‑N 推荐与解释'
+gate: 'CONCERNS'
+status_reason: 'Initial gate: 评分/排序/解释一致性与可复现性需验证。'
+reviewer: 'Quinn (Test Architect)'
+updated: '2025-09-22T06:52:26.100892+00:00'
+
+waiver: { active: false }
+
+top_issues:
+  - id: 'REC-ACC-001'
+    severity: medium
+    finding: '匹配度与解释不一致/同分排序不稳定。'
+    suggested_action: '统一计算链；固定随机种子并验证回放一致性。'
+
+risk_summary:
+  totals: { critical: 0, high: 0, medium: 1, low: 0 }
+  recommendations:
+    must_fix:
+      - '实现导出与审计可复现。'
+    monitor:
+      - '大样本下 Top‑N 性能。'
+
+quality_gates:
+  - id: REC-DET-001
+    area: reliability
+    metric: '可复现性（固定随机种子）'
+    threshold: '相同输入+规则+样本+seed → Top‑N 结果 100% 一致'
+    validation: '回放作业记录 version/hash/seed 并比对结果'
+  - id: EXPL-CONS-001
+    area: maintainability
+    metric: '解释一致性（命中/缺口/权重贡献）'
+    threshold: '解释贡献之和≈得分（误差≤1e-6）；样本 100% 通过'
+    validation: '解释器单元+集成对齐测试'
+  - id: REC-PERF-001
+    area: performance
+    metric: 'Top‑N 评分/排序性能（1k 样本、N=10）'
+    threshold: 'P95 ≤ 500ms；P99 ≤ 800ms'
+    validation: '基准脚本 + 夜间趋势'

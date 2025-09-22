@@ -30,7 +30,7 @@
 graph LR
   U[用户/浏览器] --> W[Next.js 14@Vercel<br/>SSR/ISR+CDN]
   W -->|OpenAPI 客户端| A[NestJS 10 REST API<br/>Render/Railway]
-  subgraph Backend (Render/Railway)
+  subgraph Backend_Render_Railway["Backend (Render/Railway)"]
     A --> P[(Supabase Postgres)]
     A --> R[(Upstash Redis)]
     A --> D[(DuckDB)]

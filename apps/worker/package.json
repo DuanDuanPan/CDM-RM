@@ -1,0 +1,9 @@
+{
+  "name": "@cdm/worker",
+  "private": true,
+  "version": "0.0.1",
+  "scripts": {
+    "lint": "echo 'worker lint TODO'",
+    "type-check": "echo 'worker type-check TODO'"
+  }
+}

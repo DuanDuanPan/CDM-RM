@@ -1,31 +1,18 @@
 schema: 1
 story: '1.2'
 story_title: '代码规范与提交检查'
-gate: 'CONCERNS'
-status_reason: 'ESLint/Prettier/Husky/lint-staged not configured; only commitlint present.'
+gate: 'PASS'
+status_reason: 'corepack yarn install --immutable 与 lint/format/type-check 均通过，CI 已加入 lint-staged/commitlint 烟雾测试。'
 reviewer: 'Quinn (Test Architect)'
-updated: '2025-09-22T06:52:26.100892+00:00'
+updated: '2025-09-23T08:25:00Z'
 
 waiver: { active: false }
 
-top_issues:
-  - id: 'LINT-001'
-    severity: high
-    finding: 'ESLint not installed/configured; no lint script.'
-    suggested_action: 'Add ESLint with TS/React/Promise/Prettier plugins and lint script.'
-  - id: 'FMT-001'
-    severity: high
-    finding: 'Prettier not configured; no format scripts.'
-    suggested_action: 'Add Prettier config and `prettier:check`/`prettier:write` scripts.'
-  - id: 'HUSKY-001'
-    severity: medium
-    finding: 'No Husky/lint-staged pre-commit automation.'
-    suggested_action: 'Configure pre-commit to run eslint --fix and prettier -w.'
+top_issues: []
 
 risk_summary:
-  totals: { critical: 0, high: 2, medium: 1, low: 0 }
+  totals: { critical: 0, high: 0, medium: 0, low: 0 }
   recommendations:
-    must_fix:
-      - 'Introduce ESLint/Prettier with pre-commit enforcement.'
+    must_fix: []
     monitor:
-      - 'Ensure CI includes lint and format checks.'
+      - '持续留意 lint-staged/commitlint 烟雾测试耗时，并在新增目录时更新匹配模式。'

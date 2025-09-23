@@ -15,15 +15,50 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node & Corepack
+        id: setup_node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'yarn'
       - run: corepack enable
       - run: yarn --version
-      - run: yarn install --immutable
-      - name: Prepare reports dir
-        run: mkdir -p reports
+      - name: Install dependencies (immutable)
+        run: |
+          mkdir -p reports
+          START=$(date +%s)
+          yarn install --immutable
+          END=$(date +%s)
+          DURATION=$((END-START))
+          echo "yarn_install_seconds=$DURATION" | tee reports/yarn-install-metrics.txt
+      - run: git diff --exit-code yarn.lock
+      - name: Record Yarn cache metadata
+        run: |
+          mkdir -p reports
+          echo "cache-hit=${{ steps.setup_node.outputs.cache-hit }}" | tee reports/yarn-cache.txt
+      - name: Verify Yarn config guards
+        run: |
+          yarn config get nodeLinker | tee reports/nodeLinker.txt
+          if ! grep -q 'node-modules' reports/nodeLinker.txt; then
+            echo 'nodeLinker 未配置为 node-modules';
+            exit 1;
+          fi
+          yarn workspaces list --json > reports/workspaces.json
+          node scripts/workspace-smoke.cjs
+      - name: Smoke test lint-staged
+        run: |
+          echo "export const __lintStagedSmoke = 1;" > scripts/__lint-staged-smoke__.ts
+          git add scripts/__lint-staged-smoke__.ts
+          HUSKY=0 npx lint-staged --allow-empty
+          git reset scripts/__lint-staged-smoke__.ts
+          rm scripts/__lint-staged-smoke__.ts
+      - name: Smoke test commitlint
+        run: |
+          echo "feat(ci): commitlint smoke" | npx commitlint
+      - run: yarn lint
+      - run: yarn prettier:check
+      - run: yarn type-check
+      - run: yarn test:web
+      - run: yarn test:api
       - name: Export OpenAPI
         run: yarn api:openapi
       - name: Spectral lint
@@ -47,6 +82,10 @@ jobs:
             docs/openapi.json
             reports/spectral.sarif
             reports/openapi-diff.txt
+            reports/nodeLinker.txt
+            reports/workspaces.json
+            reports/yarn-install-metrics.txt
+            reports/yarn-cache.txt
 
   security:
     runs-on: ubuntu-latest
@@ -67,4 +106,3 @@ jobs:
         with:
           name: security
           path: reports/
-

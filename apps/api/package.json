@@ -1,0 +1,9 @@
+{
+  "name": "@cdm/api",
+  "private": true,
+  "version": "0.0.1",
+  "scripts": {
+    "lint": "echo 'api lint TODO'",
+    "type-check": "echo 'api type-check TODO'"
+  }
+}

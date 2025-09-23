@@ -39,6 +39,16 @@ CDM (Change & Demand Management) 需求集成 MVP 旨在于单模块试点内打
 
 > CI (`.github/workflows/quality.yml`) 已启用 `actions/setup-node@v4` 的 Yarn 缓存，并在安装后执行 `git diff --exit-code yarn.lock`，确保缓存命中与锁文件稳定性。
 
+## 开发流程
+
+1. 本地开发前执行 `yarn lint && yarn prettier:check && yarn type-check`，保持与 CI 质量门槛一致。
+2. 提交代码前，`yarn prepare` 会自动安装 Husky 钩子；`pre-commit` 钩子通过 `lint-staged` 自动运行 ESLint/Prettier 修复。
+3. 删除或修改格式后请使用 `yarn lint:fix` 与 `yarn format` 进行批量矫正，保证提交 diff 纯净。
+4. Git 提交遵循 Conventional Commits，例如 `feat(api): add request audit log`，scope 需保持 kebab-case。
+5. 如涉及 API 变更，需在 PR 描述中附 `yarn api:openapi` / `yarn api:types` 等命令的执行记录，并说明安全影响。
+6. 在打开 PR 前确认 README“质量门槛”要求已满足，并在 PR 模板中勾选自检项。
+7. 如本次改动影响性能/可靠性/容量，请同步比对 `docs/architecture/nfrslo-与告警性能可靠性可用性.md` 与 `docs/architecture/测试与覆盖率testing-coverage.md`，更新必要的监控或覆盖率计划。
+
 ## Repository Layout
 
 | Path                        | Description                                             |

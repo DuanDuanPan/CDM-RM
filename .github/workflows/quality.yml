@@ -44,6 +44,16 @@ jobs:
           fi
           yarn workspaces list --json > reports/workspaces.json
           node scripts/workspace-smoke.cjs
+      - name: Smoke test lint-staged
+        run: |
+          echo "export const __lintStagedSmoke = 1;" > scripts/__lint-staged-smoke__.ts
+          git add scripts/__lint-staged-smoke__.ts
+          HUSKY=0 npx lint-staged --allow-empty
+          git reset scripts/__lint-staged-smoke__.ts
+          rm scripts/__lint-staged-smoke__.ts
+      - name: Smoke test commitlint
+        run: |
+          echo "feat(ci): commitlint smoke" | npx commitlint
       - run: yarn lint
       - run: yarn prettier:check
       - run: yarn type-check

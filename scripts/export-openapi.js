@@ -3,6 +3,7 @@
 // - If docs/openapi.baseline.json exists, copy and patch version/servers into docs/openapi.json
 // - Otherwise, write a minimal skeleton spec to docs/openapi.json
 
+/* eslint-disable @typescript-eslint/no-var-requires */
 const fs = require('fs');
 const path = require('path');
 
@@ -54,4 +55,3 @@ try { main(); } catch (err) {
   console.error('[openapi] export failed:', err);
   process.exit(1);
 }
-

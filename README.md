@@ -39,6 +39,20 @@ CDM (Change & Demand Management) 需求集成 MVP 旨在于单模块试点内打
 
 > CI (`.github/workflows/quality.yml`) 已启用 `actions/setup-node@v4` 的 Yarn 缓存，并在安装后执行 `git diff --exit-code yarn.lock`，确保缓存命中与锁文件稳定性。
 
+## 质量门槛
+
+- 单元测试覆盖率：Web（Vitest）与 API（Jest）全局行/语句/函数/分支均需 ≥80%，低于阈值测试即失败。
+- 本地执行 `yarn test:client && yarn test:server` 可生成覆盖率报告，结果输出到 `reports/coverage/web` 与 `reports/coverage/api`。
+- 使用 `yarn coverage` 汇总覆盖率摘要，快速核对 `coverage-summary.json` 中的指标。
+- CI 中通过 `yarn test:client` 与 `yarn test:server` 跑通测试，并将 `coverage-web`、`coverage-api` 工件上传供审阅。
+
+### 测试基线排错
+
+- `yarn install --immutable` 如报缺失 workspace/依赖，请运行 `corepack enable` 后重新执行，并确保锁文件（`yarn.lock`、`.yarn/install-state.gz`）随代码提交。
+- `yarn test:client` 支持附加 `--no-threads`，脚本会自动转为单进程执行；仍建议默认直接运行以保持更快速度。
+- 覆盖率未达 80% 时命令会以非零状态结束，可先运行 `yarn coverage` 查看 `coverage-summary.json` 中的明细，再补充对应测试。
+- 生成的覆盖率文件位于 `reports/coverage/web` 与 `reports/coverage/api`，CI 会将其上传为 `coverage-web`、`coverage-api` 工件。
+
 ## 开发流程
 
 1. 本地开发前执行 `yarn lint && yarn prettier:check && yarn type-check`，保持与 CI 质量门槛一致。

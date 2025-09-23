@@ -45,6 +45,12 @@ module.exports = [
     settings: {
       react: {
         version: 'detect'
+      },
+      'import/resolver': {
+        typescript: {
+          project: ['tsconfig.json', 'apps/*/tsconfig.json', 'packages/*/tsconfig.json'],
+          alwaysTryTypes: true
+        }
       }
     },
     rules: {

@@ -57,8 +57,6 @@ jobs:
       - run: yarn lint
       - run: yarn prettier:check
       - run: yarn type-check
-      - run: yarn test:web
-      - run: yarn test:api
       - name: Export OpenAPI
         run: yarn api:openapi
       - name: Spectral lint
@@ -106,3 +104,52 @@ jobs:
         with:
           name: security
           path: reports/
+
+  test:
+    needs: contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node & Corepack
+        id: setup_node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+      - run: corepack enable
+      - run: yarn --version
+      - name: Install dependencies (immutable)
+        run: |
+          mkdir -p reports/coverage/web reports/coverage/api
+          yarn install --immutable
+      - name: Run client tests (Vitest)
+        run: |
+          START=$(date +%s)
+          yarn test:client
+          END=$(date +%s)
+          echo "vitest_seconds=$((END-START))" | tee reports/vitest-metrics.txt
+      - name: Run server tests (Jest)
+        run: |
+          START=$(date +%s)
+          yarn test:server
+          END=$(date +%s)
+          echo "jest_seconds=$((END-START))" | tee reports/jest-metrics.txt
+      - name: 打印覆盖率摘要
+        run: yarn coverage
+      - name: Upload coverage (web)
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-web
+          path: reports/coverage/web
+      - name: Upload coverage (api)
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-api
+          path: reports/coverage/api
+      - name: Upload coverage metrics
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-metrics
+          path: |
+            reports/vitest-metrics.txt
+            reports/jest-metrics.txt

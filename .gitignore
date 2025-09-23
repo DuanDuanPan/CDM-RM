@@ -40,6 +40,7 @@ report.*.log
 
 # Testing & coverage artifacts
 coverage/
+reports/
 *.lcov
 
 # TypeScript

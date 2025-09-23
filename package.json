@@ -16,14 +16,20 @@
     "prettier:check": "prettier --check \"{apps,packages,scripts}/**/*.{js,jsx,ts,tsx,cts,mts,cjs,mjs,json,md,yml,yaml}\" \".github/**/*.{md,yml,yaml}\" \"*.{json,md,cjs,mjs}\"",
     "format": "prettier --write \"{apps,packages,scripts}/**/*.{js,jsx,ts,tsx,cts,mts,cjs,mjs,json,md,yml,yaml}\" \".github/**/*.{md,yml,yaml}\" \"*.{json,md,cjs,mjs}\"",
     "type-check": "tsc --noEmit",
-    "test:web": "node scripts/workspace-smoke.cjs --workspace @cdm/web",
-    "test:api": "node scripts/workspace-smoke.cjs --workspace @cdm/api",
     "api:openapi": "node scripts/export-openapi.js",
     "api:spectral": "spectral lint docs/openapi.json",
     "api:diff": "openapi diff docs/openapi.baseline.json docs/openapi.json || true",
     "api:types": "openapi-typescript docs/openapi.json -o packages/api-types/src/index.ts",
     "api:client": "openapi-typescript-codegen --input docs/openapi.json --output packages/api-client --client axios --useOptions",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "test:client": "yarn workspace @cdm/web test",
+    "test:client:watch": "yarn workspace @cdm/web test:watch",
+    "test:server": "yarn workspace @cdm/api test",
+    "test:server:watch": "yarn workspace @cdm/api test:watch",
+    "test:web": "yarn test:client",
+    "test:api": "yarn test:server",
+    "test": "yarn test:client && yarn test:server",
+    "coverage": "node scripts/coverage-summary.cjs"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.4.0",

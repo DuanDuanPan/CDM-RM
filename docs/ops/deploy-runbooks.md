@@ -23,6 +23,15 @@
 - 质量：`yarn lint && yarn prettier:check && yarn type-check && yarn test:web && yarn test:api`
 - 工件：上传 OpenAPI、Spectral sarif、Diff 报告、覆盖率
 
+## 数据库迁移（Database Migrations）
+1. 准备环境变量：在 CI/本地均需设置 `DATABASE_URL`，开发环境额外推荐配置 `SHADOW_DATABASE_URL`（影子库可安全删除）。提交前可运行 `node scripts/validate-env.cjs`，该脚本基于 `dotenv-safe` 加载 `.env` 与 `.env.example` 并校验；迁移相关 Yarn 脚本会自动调用该校验。
+2. 生成客户端：`yarn prisma:generate`（会调用 `apps/api` workspace 内的 Prisma CLI）。
+3. 应用迁移：
+   - 本地迭代：`yarn prisma:migrate`（运行 `prisma migrate dev`，生成 SQL 并同步数据库）。
+   - 部署/CI：`yarn workspace @cdm/api prisma migrate deploy`，禁止在生产直接运行 `migrate dev`。
+4. 回滚演练：`yarn prisma:rollback` 生成最新迁移与空数据库的 diff SQL，需在审阅或应急时手动执行。
+5. 记录与审计：迁移日志保存在 `apps/api/prisma/migrations/<timestamp>_<name>/migration.sql`，提交 PR 时一并审核；必要时将回滚剧本补充至本手册。
+
 ## 环境变量与密钥（示例）
 - `.env.example`：列出必需变量与说明
 - GitHub Environments：`dev/staging/prod` 分离审批与 Secrets 注入
@@ -37,4 +46,3 @@
 ## 附录
 - 观测目标：参考 `docs/architecture.md` 中 Observability/Monitoring 章节
 - 错误处理：统一错误模型与用户反馈策略参考前端规范
-

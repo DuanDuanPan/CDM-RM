@@ -1,4 +1,4 @@
-// Prisma schema draft for CDM MVP (Postgres)
+// Prisma schema baseline for CDM MVP (Postgres)
 generator client {
   provider = "prisma-client-js"
 }
@@ -6,50 +6,54 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 model Requirement {
   id                 String   @id @default(cuid())
-  moduleId           String
-  objectId           String
-  baselineId         String
+  moduleId           String   @map("module_id")
+  objectId           String   @map("object_id")
+  baselineId         String   @map("baseline_id")
   title              String
   content            String
   status             String   // draft|in_review|frozen|changing|closed
   priority           String   // P0|P1|P2|P3
-  verificationMethod String?
-  dedupeHash         String   @unique
+  verificationMethod String?  @map("verification_method")
+  dedupeHash         String   @unique(map: "requirements_dedupe_hash_key") @map("dedupe_hash")
   extras             Json?
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
 
-  metrics            Metric[]
-  bindings           RequirementRbomBinding[]
-  verifications      Verification[]
+  metrics       Metric[]
+  bindings      RequirementRbomBinding[]
+  verifications Verification[]
 
-  @@index([moduleId, objectId, baselineId])
+  @@index([moduleId, objectId, baselineId], map: "idx_requirements_module_object_baseline")
+  @@index([status], map: "idx_requirements_status")
+  @@map("requirements")
 }
 
 model Metric {
   id             String   @id @default(cuid())
-  requirementId  String
+  requirementId  String   @map("requirement_id")
   name           String
   value          Float?
   unit           String?
-  normalizedUnit String?
+  normalizedUnit String?  @map("normalized_unit")
   lower          Float?
-  lowerInc       Boolean?
+  lowerInc       Boolean? @map("lower_inc")
   upper          Float?
-  upperInc       Boolean?
+  upperInc       Boolean? @map("upper_inc")
   method         String   // rule|regex|dict|llm|manual
   confidence     Float?
-  sourceFragment String?
+  sourceFragment String?  @map("source_fragment")
   extras         Json?
 
   requirement Requirement @relation(fields: [requirementId], references: [id])
 
-  @@index([requirementId])
-  @@index([name])
+  @@index([requirementId], map: "idx_metrics_requirement_id")
+  @@index([name], map: "idx_metrics_name")
+  @@map("metrics")
 }
 
 model RbomNode {
@@ -57,202 +61,221 @@ model RbomNode {
   code       String
   name       String
   level      Int
-  parentId   String?
+  parentId   String? @map("parent_id")
   path       String
-  baselineId String?
+  baselineId String? @map("baseline_id")
   extras     Json?
 
   bindings RequirementRbomBinding[]
 
-  @@index([parentId])
-  @@unique([code, baselineId])
+  @@index([parentId], map: "idx_rbom_nodes_parent_id")
+  @@index([code], map: "idx_rbom_nodes_code")
+  @@unique([code, baselineId], map: "uq_rbom_nodes_code_baseline_id")
+  @@map("rbom_nodes")
 }
 
 model RequirementRbomBinding {
-  id            String  @id @default(cuid())
-  requirementId String
-  rbomNodeId    String
-  baselineId    String?
-  createdAt     DateTime @default(now())
+  id            String   @id @default(cuid())
+  requirementId String   @map("requirement_id")
+  rbomNodeId    String   @map("rbom_node_id")
+  baselineId    String?  @map("baseline_id")
+  createdAt     DateTime @default(now()) @map("created_at")
 
   requirement Requirement @relation(fields: [requirementId], references: [id])
   rbomNode    RbomNode   @relation(fields: [rbomNodeId], references: [id])
 
-  @@unique([requirementId, rbomNodeId, baselineId])
+  @@unique([requirementId, rbomNodeId, baselineId], map: "uq_requirement_rbom_bindings")
+  @@map("requirement_rbom_bindings")
 }
 
 model Diff {
-  id             String   @id @default(cuid())
-  type           String   // added|modified|deleted
-  severity       String   // high|medium|low
-  targetType     String   // requirement|metric|rbom|other
-  targetId       String
-  before         Json?
-  after          Json?
-  description    String?
-  detectedAt     DateTime @default(now())
-  changePackageId String?
+  id              String   @id @default(cuid())
+  type            String   // added|modified|deleted
+  severity        String   // high|medium|low
+  targetType      String   @map("target_type") // requirement|metric|rbom|other
+  targetId        String   @map("target_id")
+  before          Json?
+  after           Json?
+  description     String?
+  detectedAt      DateTime @default(now()) @map("detected_at")
+  changePackageId String?  @map("change_package_id")
 
   changePackage ChangePackage? @relation(fields: [changePackageId], references: [id])
 
-  @@index([changePackageId])
-  @@index([severity])
-  @@index([targetType])
+  @@index([changePackageId], map: "idx_diffs_change_package_id")
+  @@index([severity], map: "idx_diffs_severity")
+  @@index([targetType], map: "idx_diffs_target_type")
+  @@map("diffs")
 }
 
 model ChangePackage {
   id        String   @id @default(cuid())
   title     String
-  ownerId   String
+  ownerId   String   @map("owner_id")
   severity  String   // high|medium|low
   status    String   // draft|in_progress|pending_verification|completed|closed
-  createdAt DateTime @default(now())
-  dueAt     DateTime?
+  createdAt DateTime @default(now()) @map("created_at")
+  dueAt     DateTime? @map("due_at")
 
-  orders   ChangeOrder[]
-  diffs    Diff[]
-  closure  Closure?
+  orders  ChangeOrder[]
+  diffs   Diff[]
+  closure Closure?
+  workPackages WorkPackage[]
 
-  @@index([ownerId])
-  @@index([status])
+  @@index([ownerId], map: "idx_change_packages_owner_id")
+  @@index([status], map: "idx_change_packages_status")
+  @@map("change_packages")
 }
 
 model ChangeOrder {
-  id             String   @id @default(cuid())
-  changePackageId String
-  title          String
-  assigneeId     String
-  status         String   // draft|in_progress|pending_verification|completed|closed
-  createdAt      DateTime @default(now())
-  dueAt          DateTime?
+  id              String   @id @default(cuid())
+  changePackageId String   @map("change_package_id")
+  title           String
+  assigneeId      String   @map("assignee_id")
+  status          String   // draft|in_progress|pending_verification|completed|closed
+  createdAt       DateTime @default(now()) @map("created_at")
+  dueAt           DateTime? @map("due_at")
 
   changePackage ChangePackage @relation(fields: [changePackageId], references: [id])
 
-  @@index([assigneeId])
-  @@index([status])
+  @@index([assigneeId], map: "idx_change_orders_assignee_id")
+  @@index([status], map: "idx_change_orders_status")
+  @@map("change_orders")
 }
 
 model Notification {
-  id         String   @id @default(cuid())
-  channel    String   // inbox|oa
-  recipientUserId String?
-  recipientRole   String?
-  title      String
-  body       String
-  sentAt     DateTime @default(now())
-  readAt     DateTime?
-  confirmedAt DateTime?
-  relatedType String?
-  relatedId   String?
+  id              String   @id @default(cuid())
+  channel         String   // inbox|oa
+  recipientUserId String?  @map("recipient_user_id")
+  recipientRole   String?  @map("recipient_role")
+  title           String
+  body            String
+  sentAt          DateTime @default(now()) @map("sent_at")
+  readAt          DateTime? @map("read_at")
+  confirmedAt     DateTime? @map("confirmed_at")
+  relatedType     String?   @map("related_type")
+  relatedId       String?   @map("related_id")
 
-  @@index([recipientUserId])
-  @@index([recipientRole])
-  @@index([sentAt])
+  @@index([recipientUserId], map: "idx_notifications_recipient_user_id")
+  @@index([recipientRole], map: "idx_notifications_recipient_role")
+  @@index([sentAt], map: "idx_notifications_sent_at")
+  @@map("notifications")
 }
 
 model WorkPackage {
-  id             String   @id @default(cuid())
-  changePackageId String
-  assigneeId     String
-  status         String   // issued|in_progress|done|closed
-  issuedAt       DateTime @default(now())
-  ackAt          DateTime?
+  id              String   @id @default(cuid())
+  changePackageId String   @map("change_package_id")
+  assigneeId      String   @map("assignee_id")
+  status          String   // issued|in_progress|done|closed
+  issuedAt        DateTime @default(now()) @map("issued_at")
+  ackAt           DateTime? @map("ack_at")
 
   changePackage ChangePackage @relation(fields: [changePackageId], references: [id])
   acks          Acknowledgement[]
   deliverables  Deliverable[]
 
-  @@index([assigneeId])
-  @@index([status])
+  @@index([assigneeId], map: "idx_work_packages_assignee_id")
+  @@index([status], map: "idx_work_packages_status")
+  @@map("work_packages")
 }
 
 model Acknowledgement {
   id            String   @id @default(cuid())
-  workPackageId String
-  userId        String
-  ackAt         DateTime @default(now())
+  workPackageId String   @map("work_package_id")
+  userId        String   @map("user_id")
+  ackAt         DateTime @default(now()) @map("ack_at")
   status        String   // acknowledged|rejected
   reason        String?
 
   workPackage WorkPackage @relation(fields: [workPackageId], references: [id])
+
+  @@map("acknowledgements")
 }
 
 model Deliverable {
   id            String   @id @default(cuid())
-  workPackageId String
+  workPackageId String   @map("work_package_id")
   url           String
   metadata      Json?
-  uploadedAt    DateTime @default(now())
+  uploadedAt    DateTime @default(now()) @map("uploaded_at")
   checksum      String?
 
   workPackage WorkPackage @relation(fields: [workPackageId], references: [id])
+
+  @@map("deliverables")
 }
 
 model Verification {
   id            String   @id @default(cuid())
-  requirementId String?
-  metricId      String?
+  requirementId String?  @map("requirement_id")
+  metricId      String?  @map("metric_id")
   method        String   // test|analysis|inspection|demonstration
   outcome       String   // passed|failed|blocked
-  evidenceUrls  Json?
-  verifiedBy    String
-  verifiedAt    DateTime @default(now())
+  evidenceUrls  Json?    @map("evidence_urls")
+  verifiedBy    String   @map("verified_by")
+  verifiedAt    DateTime @default(now()) @map("verified_at")
   notes         String?
 
   requirement Requirement? @relation(fields: [requirementId], references: [id])
+
+  @@map("verifications")
 }
 
 model Closure {
-  id             String   @id @default(cuid())
-  changePackageId String  @unique
-  summary        String
-  result         String   // passed|partially_passed|failed
-  closedAt       DateTime @default(now())
+  id              String   @id @default(cuid())
+  changePackageId String   @unique @map("change_package_id")
+  summary         String
+  result          String   // passed|partially_passed|failed
+  closedAt        DateTime @default(now()) @map("closed_at")
 
   changePackage ChangePackage @relation(fields: [changePackageId], references: [id])
+
+  @@map("closures")
 }
 
 model AuditLog {
-  id        String   @id @default(cuid())
-  who       Json?
-  when      DateTime @default(now())
-  action    String
-  target    Json?
-  before    Json?
-  after     Json?
-  traceId   String?
-  viewId    String?
-  clientIp  String?
+  id       String   @id @default(cuid())
+  who      Json?
+  when     DateTime @default(now())
+  action   String
+  target   Json?
+  before   Json?
+  after    Json?
+  traceId  String?  @map("trace_id")
+  viewId   String?  @map("view_id")
+  clientIp String?  @map("client_ip")
 
-  @@index([when])
-  @@index([viewId])
-  @@index([traceId])
+  @@index([when], map: "idx_audit_logs_when")
+  @@index([viewId], map: "idx_audit_logs_view_id")
+  @@index([traceId], map: "idx_audit_logs_trace_id")
+  @@map("audit_logs")
 }
 
 model Lookup {
-  id      String  @id @default(cuid())
+  id      String @id @default(cuid())
   domain  String
   key     String
   value   String
   locale  String?
   version String?
 
-  @@index([domain])
+  @@index([domain], map: "idx_lookups_domain")
+  @@map("lookups")
 }
 
 model MetaRequirementField {
-  id       String  @id @default(cuid())
-  module   String
-  key      String
-  label    String
-  type     String // text|richtext|number|boolean|date|enum|multiselect|ref
-  required Boolean?
-  visible  Boolean?
-  options  Json?
-  order    Int?
-  createdAt DateTime @default(now())
+  id        String  @id @default(cuid())
+  module    String
+  key       String
+  label     String
+  type      String // text|richtext|number|boolean|date|enum|multiselect|ref
+  required  Boolean?
+  visible   Boolean?
+  options   Json?
+  order     Int?
+  createdAt DateTime @default(now()) @map("created_at")
 
-  @@index([module])
-  @@unique([module, key])
+  @@index([module], map: "idx_meta_requirement_fields_module")
+  @@unique([module, key], map: "uq_meta_requirement_fields_module_key")
+  @@map("meta_requirement_fields")
 }
-

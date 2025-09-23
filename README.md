@@ -37,7 +37,7 @@ CDM (Change & Demand Management) 需求集成 MVP 旨在于单模块试点内打
    yarn api:diff
    ```
 
-> CI (`.github/workflows/quality.yml`) 已启用 `actions/setup-node@v4` 的 Yarn 缓存，并在安装后执行 `git diff --exit-code yarn.lock`，确保缓存命中与锁文件稳定性。
+> CI (`.github/workflows/quality.yml`) 已启用 `actions/setup-node@v4` 的 Yarn 缓存，并在安装后执行 `git diff --exit-code yarn.lock`，确保缓存命中与锁文件稳定性。新增 `db-migrate` 作业会与 `contracts`、`security`、`test` 并行运行，在容器化 Postgres/Redis 上执行 `prisma migrate deploy`、生成回滚脚本，并运行 `yarn test:migrate` 验证索引与表结构。
 
 ## 质量门槛
 
@@ -62,6 +62,14 @@ CDM (Change & Demand Management) 需求集成 MVP 旨在于单模块试点内打
 5. 如涉及 API 变更，需在 PR 描述中附 `yarn api:openapi` / `yarn api:types` 等命令的执行记录，并说明安全影响。
 6. 在打开 PR 前确认 README“质量门槛”要求已满足，并在 PR 模板中勾选自检项。
 7. 如本次改动影响性能/可靠性/容量，请同步比对 `docs/architecture/nfrslo-与告警性能可靠性可用性.md` 与 `docs/architecture/测试与覆盖率testing-coverage.md`，更新必要的监控或覆盖率计划。
+
+### 数据库迁移
+
+- 复制 `.env.example` 为 `.env` 并根据环境调整 `DATABASE_URL` / `SHADOW_DATABASE_URL`；本地建议复用 `docker-compose.dev.yml` 中的 Postgres。任何 `yarn prisma:*` 或 `yarn test:migrate` 命令都会先执行 `scripts/validate-env.cjs`，该脚本基于 `dotenv-safe` 自动加载 `.env` 并对 `.env.example` 做比对，缺失变量会立即退出。
+- 生成客户端：`yarn prisma:generate`（等价于 `yarn workspace @cdm/api prisma generate`）。
+- 创建/更新迁移：`yarn prisma:migrate`，默认运行 `prisma migrate dev` 并写入 `apps/api/prisma/migrations/`。
+- 部署生产迁移：CI/预发使用 `yarn workspace @cdm/api prisma migrate deploy`；回滚脚本可通过 `yarn prisma:rollback` 生成。
+- 验证迁移：运行 `yarn test:migrate`，会对核心表/索引执行集成检查（见 `apps/api/__tests__/migration.spec.ts`）。
 
 ## Repository Layout
 

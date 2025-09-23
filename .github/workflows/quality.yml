@@ -105,6 +105,78 @@ jobs:
           name: security
           path: reports/
 
+  db-migrate:
+    needs: contracts
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: cdm
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node & Corepack
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+      - run: corepack enable
+      - run: yarn --version
+      - name: Install dependencies (immutable)
+        run: yarn install --immutable
+      - name: Prepare shadow database
+        run: |
+          PGPASSWORD=postgres psql -h 127.0.0.1 -U postgres -d postgres -c "DROP DATABASE IF EXISTS cdm_shadow;"
+          PGPASSWORD=postgres psql -h 127.0.0.1 -U postgres -d postgres -c "CREATE DATABASE cdm_shadow;"
+      - name: Prepare migration reports directory
+        run: mkdir -p reports/migrations
+      - name: Prisma generate
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/cdm
+          SHADOW_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/cdm_shadow
+        run: yarn prisma:generate
+      - name: Apply migrations
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/cdm
+          SHADOW_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/cdm_shadow
+        run: |
+          yarn workspace @cdm/api prisma migrate deploy 2>&1 | tee reports/migrations/migrate-deploy.log
+      - name: Generate rollback script
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/cdm
+          SHADOW_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/cdm_shadow
+        run: |
+          yarn prisma:rollback > reports/migrations/migrate-rollback.sql
+      - name: Run migration verification tests
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/cdm
+          SHADOW_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/cdm_shadow
+        run: yarn test:migrate
+      - name: Upload migration artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-migrate
+          path: reports/migrations
+
   test:
     needs: contracts
     runs-on: ubuntu-latest

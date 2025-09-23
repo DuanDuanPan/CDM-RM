@@ -1,5 +1,12 @@
 {
   "extends": "./packages/config/tsconfig.base.json",
-  "include": ["apps/**/*.ts", "apps/**/*.tsx", "packages/**/*.ts", "scripts/**/*.ts"],
+  "include": [
+    "apps/**/*.ts",
+    "apps/**/*.tsx",
+    "packages/**/*.ts",
+    "scripts/**/*.ts",
+    "vendor/**/*.ts",
+    "vendor/**/*.d.ts"
+  ],
   "exclude": ["node_modules", ".yarn", "dist", "build", "web-bundles"]
 }

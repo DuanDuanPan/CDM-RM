@@ -9,6 +9,10 @@
     "apps/*",
     "packages/*"
   ],
+  "dependencies": {
+    "@prisma/client": "^5.17.0",
+    "dotenv-safe": "file:vendor/dotenv-safe"
+  },
   "scripts": {
     "setup": "corepack enable && yarn --version",
     "lint": "eslint '{apps,packages,scripts}/**/*.{js,jsx,ts,tsx,cts,mts,cjs,mjs}' --max-warnings=0",
@@ -29,7 +33,12 @@
     "test:web": "yarn test:client",
     "test:api": "yarn test:server",
     "test": "yarn test:client && yarn test:server",
-    "coverage": "node scripts/coverage-summary.cjs"
+    "coverage": "node scripts/coverage-summary.cjs",
+    "prisma:generate": "node scripts/validate-env.cjs && yarn workspace @cdm/api prisma generate",
+    "prisma:migrate": "node scripts/validate-env.cjs && yarn workspace @cdm/api prisma migrate dev",
+    "prisma:rollback": "node scripts/validate-env.cjs && yarn workspace @cdm/api prisma migrate diff --from-migrations=prisma/migrations --to-empty --script --shadow-database-url=$SHADOW_DATABASE_URL",
+    "pretest:migrate": "yarn prisma:generate",
+    "test:migrate": "node scripts/validate-env.cjs && yarn workspace @cdm/api test:migrate"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.4.0",
@@ -53,6 +62,7 @@
     "openapi-typescript": "^7.0.0",
     "openapi-typescript-codegen": "^0.27.0",
     "prettier": "^3.3.3",
+    "prisma": "^5.17.0",
     "typescript": "^5.5.4"
   },
   "lint-staged": {

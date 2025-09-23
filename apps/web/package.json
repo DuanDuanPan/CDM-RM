@@ -1,0 +1,9 @@
+{
+  "name": "@cdm/web",
+  "private": true,
+  "version": "0.0.1",
+  "scripts": {
+    "lint": "echo 'web lint TODO'",
+    "type-check": "echo 'web type-check TODO'"
+  }
+}

@@ -1,0 +1,7 @@
+.yarn/
+node_modules/
+web-bundles/
+dist/
+reports/
+AGENTS.md
+scripts/export-openapi.js

@@ -1,9 +1,21 @@
 {
   "name": "cdm-architecture",
   "private": true,
-  "packageManager": "yarn@3.6.1",
-  "engines": { "node": ">=20 <21" },
+  "packageManager": "yarn@3.6.1+sha512.de524adec81a6c3d7a26d936d439d2832e351cdfc5728f9d91f3fc85dd20b04391c038e9b4ecab11cae2b0dd9f0d55fd355af766bc5c1a7f8d25d96bb2a0b2ca",
+  "engines": {
+    "node": ">=20 <21"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
+    "setup": "corepack enable && yarn --version",
+    "lint": "eslint '{apps,packages,scripts}/**/*.{ts,tsx,js}' --max-warnings=0",
+    "prettier:check": "prettier --check \"{apps,packages,scripts}/**/*.{js,ts,tsx,json,md}\" \"*.{json,md}\"",
+    "type-check": "tsc --noEmit",
+    "test:web": "node scripts/workspace-smoke.cjs --workspace @cdm/web",
+    "test:api": "node scripts/workspace-smoke.cjs --workspace @cdm/api",
     "api:openapi": "node scripts/export-openapi.js",
     "api:spectral": "spectral lint docs/openapi.json",
     "api:diff": "openapi diff docs/openapi.baseline.json docs/openapi.json || true",
@@ -11,10 +23,18 @@
     "api:client": "openapi-typescript-codegen --input docs/openapi.json --output packages/api-client --client axios --useOptions"
   },
   "devDependencies": {
-    "@redocly/openapi-cli": "^1.0.0",
+    "@redocly/openapi-cli": "^1.0.0-beta.95",
     "@stoplight/spectral-cli": "^6.0.0",
+    "@types/node": "^20.14.2",
+    "@typescript-eslint/eslint-plugin": "^7.17.0",
+    "@typescript-eslint/parser": "^7.17.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.29.1",
     "openapi-typescript": "^7.0.0",
-    "openapi-typescript-codegen": "^0.27.0"
+    "openapi-typescript-codegen": "^0.27.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4"
   }
 }
-

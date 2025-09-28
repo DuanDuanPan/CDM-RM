@@ -17,7 +17,16 @@ const mergeRules = (...configs) =>
 
 module.exports = [
   {
-    ignores: ['**/node_modules/**', '.turbo/**', '.yarn/**', 'web-bundles/**', 'dist/**', 'coverage/**']
+    ignores: [
+      '**/node_modules/**',
+      '.turbo/**',
+      '.yarn/**',
+      'web-bundles/**',
+      'dist/**',
+      'coverage/**',
+      'packages/api-client/**',
+      'packages/api-types/**'
+    ]
   },
   {
     files: ['**/*.{ts,tsx,js,jsx}'],

@@ -11,7 +11,7 @@ export default defineConfig({
       provider: 'v8',
       reportsDirectory: path.resolve(__dirname, '../../reports/coverage/web'),
       reporter: ['text', 'lcov', 'cobertura', 'json-summary'],
-      exclude: ['scripts/**'],
+      exclude: ['scripts/**', 'global.d.ts'],
       thresholds: {
         lines: 80,
         functions: 80,

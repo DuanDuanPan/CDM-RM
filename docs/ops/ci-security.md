@@ -46,10 +46,8 @@ jobs:
       # 3) 生成 OpenAPI（以 Nest Swagger 为例）
       - name: Install deps
         run: yarn install --immutable
-      - name: Build API & export OpenAPI
-        run: |
-          yarn build:api # 你们的构建脚本
-          node scripts/export-openapi.js # 输出到 ./docs/openapi.json
+      - name: Sync OpenAPI artifacts
+        run: yarn build:contracts # 导出规范并生成类型/客户端
 
       # 4) OpenAPI 契约 Lint（Spectral）
       - name: Spectral lint
@@ -67,6 +65,8 @@ jobs:
           fi
 ```
 
+> contracts 作业会在 `reports/contracts-metrics.txt` 记录执行耗时，可在 GitHub Actions Step Summary 或外部监控（Datadog 等）中消费该指标，持续观察稳定性。
+
 ---
 
 ## 2) package.json 脚本建议
@@ -76,9 +76,12 @@ jobs:
   "scripts": {
     "security:leaks": "gitleaks detect --no-git -v",
     "security:osv": "osv-scanner --lockfile=./yarn.lock --recursive .",
+    "build:contracts": "yarn api:openapi && yarn api:types && yarn api:client",
     "api:openapi": "node scripts/export-openapi.js",
     "api:spectral": "spectral lint docs/openapi.json",
-    "api:diff": "openapi diff docs/openapi.baseline.json docs/openapi.json || true"
+    "api:diff": "npx @redocly/openapi-cli@latest diff docs/openapi.baseline.json docs/openapi.json --fail-on-changed --fail-on-unclassified",
+    "api:types": "node scripts/generate-api-types.js",
+    "api:client": "node scripts/generate-api-client.js"
   },
   "devDependencies": {
     "@stoplight/spectral-cli": "^6",
@@ -111,9 +114,18 @@ yarn security:leaks
 # 依赖安全（或改用 npm audit / audit-ci）
 yarn security:osv
 
-# OpenAPI 生成 + Lint + Diff
-yarn api:openapi
+# OpenAPI 生成 + Lint + Diff（diff 检测到 breaking change 时会直接失败）
+yarn build:contracts
 yarn api:spectral
 yarn api:diff
+yarn api:client
 ```
 
+---
+
+## 5) 刷新 OpenAPI 契约（Runbook）
+
+1. 执行 `yarn build:contracts`：一次性导出最新 OpenAPI 契约并生成类型 (`packages/api-types/src/index.ts`) 与客户端 SDK (`packages/api-client/src`)，脚本会自动保留 `custom-exports.ts`。
+2. 如需单独刷新，可分别运行 `yarn api:openapi` / `yarn api:types` / `yarn api:client`。
+3. `yarn api:diff` 依赖 `@redocly/openapi-cli diff --fail-on-changed`，一旦检测到 breaking change 即以非零状态退出，需在 PR 说明差异及应对方案。
+4. 前端接入：通过 `apps/web/lib/api/client.ts` 提供的 `serverApi()` / `browserApi()` 包装器复用 `@cdm/api-client`，禁止直接拼接 REST URL。

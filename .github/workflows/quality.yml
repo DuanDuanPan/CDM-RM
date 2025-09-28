@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Mark contracts job start
+        run: echo "CONTRACTS_JOB_START=$(date +%s)" >> "$GITHUB_ENV"
       - name: Setup Node & Corepack
         id: setup_node
         uses: actions/setup-node@v4
@@ -57,22 +59,30 @@ jobs:
       - run: yarn lint
       - run: yarn prettier:check
       - run: yarn type-check
-      - name: Export OpenAPI
-        run: yarn api:openapi
+      - name: Sync OpenAPI artifacts (spec + types + client)
+        run: yarn build:contracts
       - name: Spectral lint
         run: npx @stoplight/spectral-cli lint docs/openapi.json --format sarif -o reports/spectral.sarif
       - name: OpenAPI diff (vs baseline)
         run: |
-          if [ -f docs/openapi.baseline.json ]; then \
-            npx @redocly/openapi-cli@latest diff docs/openapi.baseline.json docs/openapi.json > reports/openapi-diff.txt || true; \
-          else \
-            echo 'No baseline found' > reports/openapi-diff.txt; \
+          if [ -f docs/openapi.baseline.json ]; then
+            yarn api:diff | tee reports/openapi-diff.txt
+          else
+            echo 'No baseline found' | tee reports/openapi-diff.txt
           fi
-      - name: Generate Types & Client
+      - name: Record contracts duration metrics
+        if: always()
         run: |
-          yarn api:types
-          yarn api:client
+          mkdir -p reports
+          END=$(date +%s)
+          if [ -z "$CONTRACTS_JOB_START" ]; then
+            echo "contracts_duration_seconds=unknown" > reports/contracts-metrics.txt
+          else
+            DURATION=$((END - CONTRACTS_JOB_START))
+            echo "contracts_duration_seconds=$DURATION" > reports/contracts-metrics.txt
+          fi
       - name: Upload contract artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: contracts
@@ -84,6 +94,10 @@ jobs:
             reports/workspaces.json
             reports/yarn-install-metrics.txt
             reports/yarn-cache.txt
+            reports/contracts-metrics.txt
+          description: >-
+            合同检查工件：Spectral 报告（API Owner 负责处理规则告警）与 OpenAPI Diff（QA/后端联动评估 breaking 变更），
+            同时包含安装指标供平台团队排查缓存与依赖问题。
 
   security:
     runs-on: ubuntu-latest

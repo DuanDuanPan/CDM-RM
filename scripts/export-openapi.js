@@ -1,57 +1,97 @@
 #!/usr/bin/env node
-// Minimal OpenAPI export helper
-// - If docs/openapi.baseline.json exists, copy and patch version/servers into docs/openapi.json
-// - Otherwise, write a minimal skeleton spec to docs/openapi.json
-
 /* eslint-disable @typescript-eslint/no-var-requires */
 const fs = require('fs');
 const path = require('path');
+const supertest = require('supertest');
 
-function ensureDir(p) {
-  if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true });
+const rootDir = path.resolve(__dirname, '..');
+const tsconfigPath = path.join(rootDir, 'tsconfig.json');
+
+require('ts-node').register({
+  project: tsconfigPath,
+  transpileOnly: true,
+  compilerOptions: {
+    module: 'CommonJS',
+    moduleResolution: 'Node',
+    experimentalDecorators: true,
+    emitDecoratorMetadata: true
+  }
+});
+
+function ensureEnvironmentDefaults() {
+  if (!process.env.DATABASE_URL) {
+    process.env.DATABASE_URL = 'postgresql://example:example@127.0.0.1:5432/cdm';
+  }
+
+  if (!process.env.NODE_ENV) {
+    process.env.NODE_ENV = 'development';
+  }
 }
 
-function main() {
-  const root = path.resolve(__dirname, '..');
-  const docsDir = path.join(root, 'docs');
-  const baselinePath = path.join(docsDir, 'openapi.baseline.json');
+ensureEnvironmentDefaults();
+
+const { createApp } = require('../apps/api/src/bootstrap');
+const {
+  OPENAPI_ACCESS_HEADER,
+  setupOpenApi
+} = require('../apps/api/src/openapi/setup-openapi');
+
+function ensureDir(targetPath) {
+  if (!fs.existsSync(targetPath)) {
+    fs.mkdirSync(targetPath, { recursive: true });
+  }
+}
+
+function ensureOpenApiServiceKey() {
+  if (!process.env.OPENAPI_SERVICE_KEY) {
+    process.env.OPENAPI_SERVICE_KEY = 'local-openapi-key';
+  }
+
+  return process.env.OPENAPI_SERVICE_KEY;
+}
+
+async function main() {
+  const docsDir = path.join(rootDir, 'docs');
   const outPath = path.join(docsDir, 'openapi.json');
+
   ensureDir(docsDir);
+  ensureEnvironmentDefaults();
+  const serviceKey = ensureOpenApiServiceKey();
 
-  const version = process.env.APP_VERSION || new Date().toISOString().slice(0, 10);
-  const baseURL = process.env.API_BASE_URL; // optional override
+  const app = await createApp();
 
-  let spec;
-  if (fs.existsSync(baselinePath)) {
-    spec = JSON.parse(fs.readFileSync(baselinePath, 'utf8'));
-  } else {
-    spec = {
-      openapi: '3.0.3',
-      info: {
-        title: 'CDM 需求集成 MVP API',
-        version,
-        description: '自动生成的最小 OpenAPI 规格（未发现 baseline）',
-      },
-      servers: [{ url: 'http://localhost:4000/api', description: '本地' }],
-      paths: {},
-      components: {},
-    };
+  try {
+    const { document } = await setupOpenApi(app);
+
+    if (!app.isInitialized) {
+      await app.init();
+    }
+
+    const version = document?.info?.version ?? '0.0.0';
+
+    if (process.env.API_BASE_URL) {
+      const baseUrl = process.env.API_BASE_URL;
+      const servers = Array.isArray(document.servers) ? document.servers : [];
+      document.servers = [
+        { url: baseUrl, description: 'override' },
+        ...servers.filter((server) => server.url !== baseUrl)
+      ];
+    }
+
+    fs.writeFileSync(outPath, JSON.stringify(document, null, 2));
+    console.log(`[openapi] Exported to ${path.relative(rootDir, outPath)} (version=${version})`);
+
+    const httpServer = app.getHttpServer();
+    await supertest(httpServer)
+      .get('/api/__openapi.json')
+      .set(OPENAPI_ACCESS_HEADER, serviceKey)
+      .expect(200);
+  } finally {
+    await app.close();
   }
-
-  // Patch version and servers
-  spec.info = spec.info || {};
-  spec.info.version = version;
-  if (baseURL) {
-    spec.servers = Array.isArray(spec.servers) ? spec.servers : [];
-    // Put override at first position
-    spec.servers = [{ url: baseURL, description: 'override' }, ...spec.servers.filter(s => s.url !== baseURL)];
-  }
-
-  fs.writeFileSync(outPath, JSON.stringify(spec, null, 2));
-  console.log(`[openapi] Exported to ${path.relative(root, outPath)} (version=${version})`);
 }
 
-try { main(); } catch (err) {
-  console.error('[openapi] export failed:', err);
+main().catch((error) => {
+  console.error('[openapi] export failed:', error);
   process.exit(1);
-}
+});

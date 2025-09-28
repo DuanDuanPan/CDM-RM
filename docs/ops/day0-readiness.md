@@ -49,7 +49,7 @@
 - 命令建议：
   - `corepack enable && yarn --version`
   - `yarn install --immutable`
+  - `grep OPENAPI_SERVICE_KEY .env`（确保导出端点具备非空密钥）
   - `yarn workspaces list --json`
-  - `yarn api:openapi && yarn api:types && yarn api:client`
+  - `yarn build:contracts`
 - 产物快照：将 `docs/openapi.json`、`reports/*.sarif`、`reports/openapi-diff.txt` 作为 CI 工件上传
-

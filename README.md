@@ -12,27 +12,28 @@ CDM (Change & Demand Management) 需求集成 MVP 旨在于单模块试点内打
 ## Quick Start
 
 1. 使用 Volta 或 `nvm` 切换到 Node.js v20.14.0（仓库已提供 `.nvmrc`）。
-2. 执行初始化脚本，启用 Corepack 并确认 Yarn 3.6.1：
+2. 复制 `.env.example` 为 `.env`，并设置 `OPENAPI_SERVICE_KEY`（必须为非空随机值）以及可选的 `OPENAPI_ALLOWED_TAGS` 等参数，确保 `/api/__openapi.json` 只对授权客户端可见。
+3. 执行初始化脚本，启用 Corepack 并确认 Yarn 3.6.1：
    ```bash
    yarn setup
    ```
-3. 安装依赖（首次安装会生成 `yarn.lock`，后续请保持不可变安装）：
+4. 安装依赖（首次安装会生成 `yarn.lock`，后续请保持不可变安装）：
    ```bash
    corepack yarn install --immutable
    ```
-4. 验证工作区识别是否正确（结果应列出 apps 与 packages 下的各个目录）：
+5. 验证工作区识别是否正确（结果应列出 apps 与 packages 下的各个目录）：
    ```bash
    corepack yarn workspaces list --verbose
    ```
-5. 生成/更新 OpenAPI 规格（基于 `docs/openapi.baseline.json`）：
+6. 同步 OpenAPI 契约与生成产物（包含规范导出、类型与客户端 SDK）：
    ```bash
-   yarn api:openapi
+   yarn build:contracts
    ```
-6. 使用 Spectral 校验 OpenAPI 规范：
+7. 使用 Spectral 校验 OpenAPI 规范：
    ```bash
    yarn api:spectral
    ```
-7. 如需对比最新 OpenAPI 与基线差异：
+8. 如需对比最新 OpenAPI 与基线差异（命令在发现 breaking change 时会直接失败）：
    ```bash
    yarn api:diff
    ```
@@ -45,6 +46,7 @@ CDM (Change & Demand Management) 需求集成 MVP 旨在于单模块试点内打
 - 本地执行 `yarn test:client && yarn test:server` 可生成覆盖率报告，结果输出到 `reports/coverage/web` 与 `reports/coverage/api`。
 - 使用 `yarn coverage` 汇总覆盖率摘要，快速核对 `coverage-summary.json` 中的指标。
 - CI 中通过 `yarn test:client` 与 `yarn test:server` 跑通测试，并将 `coverage-web`、`coverage-api` 工件上传供审阅。
+- CI contracts 作业会在 `reports/contracts-metrics.txt` 记录运行耗时，可作为后续 GitHub Actions/Datadog 稳定性监控的输入。
 
 ### 测试基线排错
 
@@ -92,11 +94,15 @@ CDM (Change & Demand Management) 需求集成 MVP 旨在于单模块试点内打
 
 ## API Tooling
 
-- `yarn api:openapi`：从基线导出或生成最小 OpenAPI 规格，可通过 `APP_VERSION` 与 `API_BASE_URL` 环境变量覆盖版本及服务端点。
+- `yarn build:contracts`：一次性导出最新 OpenAPI 契约，并同步生成 `@cdm/api-types` 与 `@cdm/api-client` 产物，适合构建/发布流程调用。
+- `yarn api:openapi`：通过 Nest 实例实时导出最新契约，写入 `docs/openapi.json` 并在内存中命中 `/api/__openapi.json`（脚本自动注入占位数据库连接与 supertest 校验），仍可通过 `APP_VERSION`、`API_BASE_URL` 覆盖版本与服务器地址。
 - `yarn api:spectral`：使用 Stoplight Spectral 对 `docs/openapi.json` 执行规范检查。
-- `yarn api:diff`：对比 `docs/openapi.baseline.json` 与最新导出的差异（不会因差异退出）。
-- `yarn api:types`：基于最新 OpenAPI 生成 TypeScript 类型定义（输出至 `packages/api-types/`）。
-- `yarn api:client`：生成 Axios 客户端 SDK（输出至 `packages/api-client/`）。
+- `yarn api:diff`：对比 `docs/openapi.baseline.json` 与最新导出的差异，并在检测到 breaking change 时返回非零退出码（基于 `@redocly/openapi-cli diff --fail-on-changed`）。
+- `yarn api:types`：`scripts/generate-api-types.js` 将类型输出到 `packages/api-types/src/index.ts`，并自动保留 `packages/api-types/src/custom-exports.ts` 中的团队扩展导出。
+- `yarn api:client`：`scripts/generate-api-client.js` 将 SDK 生成到 `packages/api-client/src`，顶层 `packages/api-client/index.ts` 仅 re-export，避免覆盖包级元数据。
+- `apps/web/lib/api/client.ts`：前端统一调用入口，提供 `serverApi()` / `browserApi()` 包装器在服务器/浏览器环境下注入 `@cdm/api-client` 配置，禁止手写 REST 路径。
+
+> 若在运行环境设置 `OPENAPI_SERVICE_KEY`，访问 `/api/__openapi.json` 或 `/api/docs` 需携带 `x-openapi-key` 或 `Authorization: Bearer`，默认情况下未配置该变量可直接访问。
 
 ## Documentation & Collaboration
 

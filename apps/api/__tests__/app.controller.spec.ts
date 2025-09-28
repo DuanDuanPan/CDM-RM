@@ -25,5 +25,18 @@ describe('AppController (集成测试)', () => {
     expect(response.body.status).toBe('ok');
     expect(response.body).toHaveProperty('uptime');
     expect(response.body).toHaveProperty('timestamp');
+    expect(response.body.checks.openapi).toMatchObject({
+      requiresAuth: false,
+      tokenConfigured: false
+    });
+    expect(response.body.links).toMatchObject({
+      openapi: {
+        url: '/api/__openapi.json',
+        header: 'x-openapi-key',
+        requiresAuth: false,
+        tokenConfigured: false
+      },
+      swaggerUi: '/api/docs'
+    });
   });
 });

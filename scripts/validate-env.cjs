@@ -11,8 +11,15 @@ function loadDotenvSafe() {
 
 const { config } = loadDotenvSafe();
 
-const REQUIRED_KEYS = ['DATABASE_URL'];
-const OPTIONAL_KEYS = ['SHADOW_DATABASE_URL', 'REDIS_URL'];
+const REQUIRED_KEYS = ['DATABASE_URL', 'OPENAPI_SERVICE_KEY'];
+const OPTIONAL_KEYS = [
+  'SHADOW_DATABASE_URL',
+  'REDIS_URL',
+  'OPENAPI_ALLOWED_TAGS',
+  'OPENAPI_EXCLUDED_TAGS',
+  'OPENAPI_HIDE_SERVERS',
+  'OPENAPI_PUBLIC_SERVER_URL'
+];
 
 function validateEnv() {
   const rootDir = path.resolve(__dirname, '..');

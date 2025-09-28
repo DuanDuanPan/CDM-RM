@@ -1,27 +1,18 @@
 schema: 1
 story: '1.5'
 story_title: 'Swagger/OpenAPI 导出'
-gate: 'CONCERNS'
-status_reason: 'CI has OpenAPI export/lint/diff; runtime route /api/__openapi.json missing.'
+gate: 'PASS'
+status_reason: '通过：OpenAPI 路由已启用受控访问（x-openapi-key/Bearer），实现标签白名单与 servers 脱敏；CI 使用 @redocly/openapi-cli diff --fail-on-changed 与 --fail-on-unclassified（严格覆盖 breaking 变更）；contracts 作业记录耗时指标并上传工件；API 集成测试验证鉴权与控制器↔paths 一致性均通过。'
 reviewer: 'Quinn (Test Architect)'
-updated: '2025-09-22T06:52:26.100892+00:00'
+updated: '2025-09-28T04:08:00Z'
 
 waiver: { active: false }
 
-top_issues:
-  - id: 'API-OPENAPI-001'
-    severity: high
-    finding: 'No runtime Swagger route to serve the spec.'
-    suggested_action: 'Expose /api/__openapi.json from API service.'
-  - id: 'BUILD-OPENAPI-001'
-    severity: medium
-    finding: 'Types/client generation not integrated with build/release.'
-    suggested_action: 'Wire api:types/api:client into build or publishing.'
+top_issues: []
 
 risk_summary:
-  totals: { critical: 0, high: 1, medium: 1, low: 0 }
+  totals: { critical: 0, high: 0, medium: 0, low: 0 }
   recommendations:
-    must_fix:
-      - 'Add runtime route for OpenAPI.'
+    must_fix: []
     monitor:
-      - 'Keep Spectral warnings actionable; manage rule waivers.'
+      - '定期审查 Spectral 告警与 contracts 耗时（reports/contracts-metrics.txt），必要时调整阈值/缓存策略。'

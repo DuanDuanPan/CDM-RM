@@ -13,13 +13,13 @@
 
 ## 本地运行（最小）
 1. 依赖：`docker compose -f docker-compose.dev.yml up -d postgres redis`
-2. 契约：`yarn api:openapi && yarn api:types && yarn api:client`
+2. 契约：`yarn build:contracts`
 3. （预留）API 启动：`yarn dev:api`（待脚手架）
 4. （预留）Web 启动：`yarn dev:web`（待脚手架）
 
 ## CI 建议流程（草案）
 - 安装：`corepack enable` → `yarn install --immutable`
-- 契约：`yarn api:openapi` → `yarn api:spectral` → `yarn api:types` → `yarn api:client`
+- 契约：`yarn build:contracts` → `yarn api:spectral` → `yarn api:diff`（diff 检测到 breaking change 时会直接失败）
 - 质量：`yarn lint && yarn prettier:check && yarn type-check && yarn test:web && yarn test:api`
 - 工件：上传 OpenAPI、Spectral sarif、Diff 报告、覆盖率
 
@@ -34,6 +34,7 @@
 
 ## 环境变量与密钥（示例）
 - `.env.example`：列出必需变量与说明
+- 强制变量：`OPENAPI_SERVICE_KEY`（用于保护 `/api/__openapi.json` 与 `/api/docs`），如需暴露额外标签需同步更新 `OPENAPI_ALLOWED_TAGS`
 - GitHub Environments：`dev/staging/prod` 分离审批与 Secrets 注入
 - 运行前验证：`dotenv-safe`/`envalid`（或等价）
 

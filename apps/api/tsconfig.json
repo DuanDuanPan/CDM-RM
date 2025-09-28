@@ -3,7 +3,7 @@
   "compilerOptions": {
     "outDir": "./dist",
     "module": "CommonJS",
-    "types": ["node", "jest"],
+    "types": ["node", "jest", "express"],
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true
   },

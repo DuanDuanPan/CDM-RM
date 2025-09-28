@@ -68,14 +68,10 @@ describe('数据库迁移基线', () => {
     );
 
     const metricIndexNames = metricIndexes.map((row: IndexRow) => row.indexname);
-    expect(metricIndexNames).toEqual(
-      expect.arrayContaining(['idx_metrics_requirement_id', 'idx_metrics_name'])
-    );
+    expect(metricIndexNames).toEqual(expect.arrayContaining(['idx_metrics_requirement_id', 'idx_metrics_name']));
 
     const rbomIndexNames = rbomIndexes.map((row: IndexRow) => row.indexname);
-    expect(rbomIndexNames).toEqual(
-      expect.arrayContaining(['idx_rbom_nodes_code', 'uq_rbom_nodes_code_baseline_id'])
-    );
+    expect(rbomIndexNames).toEqual(expect.arrayContaining(['idx_rbom_nodes_code', 'uq_rbom_nodes_code_baseline_id']));
   });
 
   it('状态筛选查询命中索引', async () => {

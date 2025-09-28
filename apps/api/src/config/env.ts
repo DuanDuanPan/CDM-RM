@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import path from 'node:path';
 
 type DotenvSafeModule = {
@@ -24,8 +25,15 @@ function loadDotenvSafe(): DotenvSafeModule {
 
 const { config } = loadDotenvSafe();
 
-const REQUIRED_KEYS = ['DATABASE_URL'] as const;
-const OPTIONAL_KEYS = ['SHADOW_DATABASE_URL', 'REDIS_URL'] as const;
+const REQUIRED_KEYS = ['DATABASE_URL', 'OPENAPI_SERVICE_KEY'] as const;
+const OPTIONAL_KEYS = [
+  'SHADOW_DATABASE_URL',
+  'REDIS_URL',
+  'OPENAPI_ALLOWED_TAGS',
+  'OPENAPI_EXCLUDED_TAGS',
+  'OPENAPI_HIDE_SERVERS',
+  'OPENAPI_PUBLIC_SERVER_URL'
+] as const;
 
 function loadEnvironment(): void {
   const rootDir = path.resolve(__dirname, '../../../../');
